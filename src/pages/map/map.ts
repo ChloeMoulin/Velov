@@ -18,12 +18,27 @@ export class MapPage {
   }
 
   olMap: any;
+  style: any;
+  layer: any;
 
   ionViewDidLoad() {
-    
+    this.style = new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: '#ff7f50',
+        width: 3
+      })
+    });
+
+    this.layer = new ol.layer.Vector({
+      source: new ol.source.Vector(),
+      Style: this.style,
+      zIndex:5
+    });
+
     this.olMap = new ol.Map({
       target:"map",
-      layers: [
+
+      layers: [this.layer,
         new ol.layer.Tile({
           source:new ol.source.OSM()
         })
@@ -31,6 +46,8 @@ export class MapPage {
       view: new ol.View({
         center: ol.proj.transform([4.8323750495910645,45.7574933281114], 'EPSG:4326','EPSG:3857'),
         zoom: 13,
+        minZoom: 12,
+        maxZoom:20
 
       }),
       controls: []
