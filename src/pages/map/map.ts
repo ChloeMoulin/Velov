@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-
+import { MapService } from '../../models/map.service';
 import { NavController } from 'ionic-angular';
+import { GoogleMap, GoogleMapsEvent, GoogleMapsLatLng } from 'ionic-native';
 
 declare var ol: any;
 
@@ -13,15 +14,23 @@ declare var ol: any;
 
 export class MapPage {
 
-  constructor(public navCtrl: NavController) {
+  constructor(public navCtrl: NavController,private mapService: MapService) {
 
   }
 
   olMap: any;
   style: any;
   layer: any;
+  markers: any;
+
+  getMarkers() {
+    this.markers = this.mapService.getMarkers();
+  }
 
   ionViewDidLoad() {
+
+
+
     this.style = new ol.style.Style({
       stroke: new ol.style.Stroke({
         color: '#ff7f50',
@@ -52,6 +61,7 @@ export class MapPage {
       }),
       controls: []
     });
+
 
   }
 
