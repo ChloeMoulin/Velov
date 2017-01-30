@@ -32,6 +32,17 @@ export class MapPage {
 
   }
 
+  buildFeatures() {
+    for(let marker in this.markers){
+      var feature = new ol.Feature();
+      feature.setStyle(this.style);
+      var coordinates = this.markers[marker].geometry.coordinates;
+      var point = new ol.geom.Point(ol.proj.transform(coordinates, 'EPSG:4326','EPSG:3857'));
+      feature.setGeometry(point);
+      this.features.push(feature);
+    }
+  }
+
   ionViewDidLoad() {
 
 
@@ -48,15 +59,8 @@ export class MapPage {
         })
       });
 
-  for(let marker in this.markers){
-    var feature = new ol.Feature();
-    feature.setStyle(this.style);
-    var coordinates = this.markers[marker].geometry.coordinates;
-    var point = new ol.geom.Point(ol.proj.transform(coordinates, 'EPSG:4326','EPSG:3857'));
-    feature.setGeometry(point);
-    this.features.push(feature);
-  }
 
+this.buildFeatures();
   this.source = new ol.source.Vector({
     features: this.features
   })
@@ -64,6 +68,72 @@ export class MapPage {
 
 
 
+  var view = new ol.View({
+    center: ol.proj.transform([4.8323750495910645,45.7574933281114], 'EPSG:4326','EPSG:3857'),
+    zoom: 13,
+    minZoom: 12,
+    maxZoom: 20
+  });
+
+
+
+    var geolocation = new ol.Geolocation({
+      projection: view.getProjection()
+    });
+
+    function el(id) {
+      return document.getElementById(id);
+    }
+
+      geolocation.setTracking(true);
+
+    // update the HTML page when the position changes.
+    geolocation.on('change', function() {
+      el('accuracy').innerText = geolocation.getAccuracy() + ' [m]';
+      el('altitude').innerText = geolocation.getAltitude() + ' [m]';
+      el('altitudeAccuracy').innerText = geolocation.getAltitudeAccuracy() + ' [m]';
+      el('heading').innerText = geolocation.getHeading() + ' [rad]';
+      el('speed').innerText = geolocation.getSpeed() + ' [m/s]';
+    });
+
+    // handle geolocation error.
+    geolocation.on('error', function(error) {
+      var info = document.getElementById('info');
+      info.innerHTML = error.message;
+      info.style.display = '';
+    });
+
+    var accuracyFeature = new ol.Feature();
+    geolocation.on('change:accuracyGeometry', function() {
+      accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+    });
+
+    var positionFeature = new ol.Feature();
+    positionFeature.setStyle(new ol.style.Style({
+      image: new ol.style.Circle({
+        radius: 6,
+        fill: new ol.style.Fill({
+          color: '#FF0000'
+        }),
+        stroke: new ol.style.Stroke({
+          color: '#fff',
+          width: 2
+        })
+      })
+    }));
+
+    geolocation.on('change:position', function() {
+      var coordinates = geolocation.getPosition();
+      positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
+      view.setCenter(coordinates);
+      view.setZoom(16);
+    });
+
+    var geoVector = new ol.layer.Vector({
+      source: new ol.source.Vector({
+        features: [accuracyFeature, positionFeature]
+      })
+    });
 
     this.olMap = new ol.Map({
       target:"map",
@@ -74,15 +144,18 @@ export class MapPage {
         }),
         new ol.layer.Vector({
               source: this.source
-            })
+            }),
+            geoVector
       ],
-      view: new ol.View({
-        center: ol.proj.transform([4.8323750495910645,45.7574933281114], 'EPSG:4326','EPSG:3857'),
-        zoom: 13
-
+      controls: ol.control.defaults({
+        attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+          collapsible: false
+        })
       }),
-      controls: []
+      view: view
     });
+
+
 
 
   }
