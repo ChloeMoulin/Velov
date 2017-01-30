@@ -33,12 +33,53 @@ export class MapPage {
   }
 
   buildFeatures() {
+    var iconStyle100 = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker100.png'
+      }))
+    });
+    var iconStyle75 = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker75.png'
+      }))
+    });
+    var iconStyle50 = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker50.png'
+      }))
+    });
+    var iconStyle25 = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker25.png'
+      }))
+    });
+    var iconStyle0 = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker0.png'
+      }))
+    });
     for(let marker in this.markers){
       var feature = new ol.Feature();
-      feature.setStyle(this.style);
+      var ratio = this.markers[marker].properties.available_bikes/this.markers[marker].properties.bike_stands;
       var coordinates = this.markers[marker].geometry.coordinates;
       var point = new ol.geom.Point(ol.proj.transform(coordinates, 'EPSG:4326','EPSG:3857'));
       feature.setGeometry(point);
+      if(this.markers[marker].properties.available_bikes == 0) {
+        feature.setStyle(iconStyle0);
+      } else if (ratio <= 0.25){
+        feature.setStyle(iconStyle25);
+      } else if (ratio <= 0.5) {
+        feature.setStyle(iconStyle50);
+      } else if (ratio <= 0.75) {
+        feature.setStyle(iconStyle75);
+      } else {
+        feature.setStyle(iconStyle100);
+      }
       this.features.push(feature);
     }
   }
