@@ -86,7 +86,7 @@ export class MapPage {
 
   ionViewDidLoad() {
 
-
+    var self = this;
     this.style = new ol.style.Style({
         image: new ol.style.Circle({
           radius: 6,
@@ -176,6 +176,10 @@ this.buildFeatures();
       })
     });
 
+    var element = document.getElementById('popup');
+
+
+
     this.olMap = new ol.Map({
       target:"map",
 
@@ -197,6 +201,28 @@ this.buildFeatures();
     });
 
 
+    var popup = new ol.Overlay({
+      element: document.getElementById('popup'),
+      positioning: 'bottom-center',
+      stopEvent: false
+    });
+
+    this.olMap.addOverlay(popup);
+    this.olMap.on('click', function(evt) {
+      var container = document.getElementById('popup');
+      var feature = self.olMap.forEachFeatureAtPixel(evt.pixel,
+          function(feature, layer) {
+            return feature;
+          });
+      if (feature) {
+        container.innerHTML = "Bonjour";
+        popup.setPosition(evt.coordinate);
+
+      } else {
+        container.innerHTML = "";
+        popup.setPosition(undefined);
+      }
+    });
 
 
   }
