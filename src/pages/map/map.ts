@@ -64,10 +64,20 @@ export class MapPage {
       }))
     });
     for(let marker in this.markers){
-      var feature = new ol.Feature();
+
       var ratio = this.markers[marker].properties.available_bikes/this.markers[marker].properties.bike_stands;
       var coordinates = this.markers[marker].geometry.coordinates;
+      var name = this.markers[marker].properties.name;
+      var address = this.markers[marker].properties.address;
+      var city = this.markers[marker].properties.commune;
+      var available_bikes = this.markers[marker].properties.available_bikes;
+      var available_bike_stands = this.markers[marker].properties.available_bike_stands;
       var point = new ol.geom.Point(ol.proj.transform(coordinates, 'EPSG:4326','EPSG:3857'));
+      var feature = new ol.Feature();
+      feature.set("name",name + " - "+city);
+      feature.set("address",address);
+      feature.set("available_bikes", available_bikes);
+      feature.set("available_bike_stands",available_bike_stands);
       feature.setGeometry(point);
       if(this.markers[marker].properties.available_bikes == 0) {
         feature.setStyle(iconStyle0);
@@ -87,18 +97,6 @@ export class MapPage {
   ionViewDidLoad() {
 
     var self = this;
-    this.style = new ol.style.Style({
-        image: new ol.style.Circle({
-          radius: 6,
-          fill: new ol.style.Fill({
-            color: '#3399CC'
-          }),
-          stroke: new ol.style.Stroke({
-            color: '#fff',
-            width: 2
-          })
-        })
-      });
 
 
 this.buildFeatures();
@@ -151,16 +149,10 @@ this.buildFeatures();
 
     var positionFeature = new ol.Feature();
     positionFeature.setStyle(new ol.style.Style({
-      image: new ol.style.Circle({
-        radius: 6,
-        fill: new ol.style.Fill({
-          color: '#FF0000'
-        }),
-        stroke: new ol.style.Stroke({
-          color: '#fff',
-          width: 2
-        })
-      })
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/self.png'
+      }))
     }));
 
     geolocation.on('change:position', function() {
@@ -215,7 +207,12 @@ this.buildFeatures();
             return feature;
           });
       if (feature) {
-        container.innerHTML = "Bonjour";
+        container.innerHTML =  "<p id='title1' display='inline-block'>"+feature.get("name")+"</p>";
+        container.innerHTML += "<p id ='title2' display='inline-block'>"+feature.get("address")+"</p><br/>";
+        container.innerHTML += "<div id='infos'>";
+        container.innerHTML += "<p><span id='subtitle'> Vélos disponibles : </span>"+feature.get("available_bikes")+"</p>";
+        container.innerHTML += "<p><span id='subtitle'> Emplacements disponibles : </span>"+feature.get("available_bike_stands")+"</p>";
+        container.innerHTML += "</div>";
         popup.setPosition(evt.coordinate);
 
       } else {
