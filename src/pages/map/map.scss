@@ -14,10 +14,20 @@
   font-size:10px;
 }
 #popup #infos {
-  font-color:#AFAFAF;
+  color:#AFAFAF;
 }
 #popup {
   background-color: #FFF;
   padding:10px;
   box-shadow: 1px 1px 12px #555;
+}
+
+#select{
+  padding:10px;
+  position:absolute;
+  right:10px;
+  top:10px;
+  z-index:10000;
+  color:#FFF;
+  background-color: rgba(0, 60, 136, 0.498039);
 }

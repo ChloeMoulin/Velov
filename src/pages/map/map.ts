@@ -142,11 +142,6 @@ this.buildFeatures();
       info.style.display = '';
     });
 
-    var accuracyFeature = new ol.Feature();
-    geolocation.on('change:accuracyGeometry', function() {
-      accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
-    });
-
     var positionFeature = new ol.Feature();
     positionFeature.setStyle(new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
@@ -155,6 +150,8 @@ this.buildFeatures();
       }))
     }));
 
+    positionFeature.set("name","self");
+
     geolocation.on('change:position', function() {
       var coordinates = geolocation.getPosition();
       positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
@@ -162,10 +159,11 @@ this.buildFeatures();
       view.setZoom(16);
     });
 
+    var geoVectorSource = new ol.source.Vector({
+      features: [positionFeature]
+    });
     var geoVector = new ol.layer.Vector({
-      source: new ol.source.Vector({
-        features: [accuracyFeature, positionFeature]
-      })
+      source: geoVectorSource
     });
 
     var element = document.getElementById('popup');
@@ -207,12 +205,17 @@ this.buildFeatures();
             return feature;
           });
       if (feature) {
-        container.innerHTML =  "<p id='title1' display='inline-block'>"+feature.get("name")+"</p>";
-        container.innerHTML += "<p id ='title2' display='inline-block'>"+feature.get("address")+"</p><br/>";
-        container.innerHTML += "<div id='infos'>";
-        container.innerHTML += "<p><span id='subtitle'> Vélos disponibles : </span>"+feature.get("available_bikes")+"</p>";
-        container.innerHTML += "<p><span id='subtitle'> Emplacements disponibles : </span>"+feature.get("available_bike_stands")+"</p>";
-        container.innerHTML += "</div>";
+        if(feature.get("name")=="self") {
+          container.innerHTML="<p id ='title1' display='inline-block'> C'est vous ! </p>";
+        } else {
+          container.innerHTML =  "<p id='title1' display='inline-block'>"+feature.get("name")+"</p>";
+          container.innerHTML += "<p id ='title2' display='inline-block'>"+feature.get("address")+"</p><br/>";
+          container.innerHTML += "<div id='infos'>";
+          container.innerHTML += "<p><span id='subtitle'> Vélos disponibles : </span>"+feature.get("available_bikes")+"</p>";
+          container.innerHTML += "<p><span id='subtitle'> Emplacements disponibles : </span>"+feature.get("available_bike_stands")+"</p>";
+          container.innerHTML += "</div>";
+
+        }
         popup.setPosition(evt.coordinate);
 
       } else {
@@ -220,6 +223,24 @@ this.buildFeatures();
         popup.setPosition(undefined);
       }
     });
+
+    var check_self = document.getElementById('check_self');
+    check_self.addEventListener('change', function(evt) {
+      if(check_self['checked']) {
+        geoVectorSource.addFeature(positionFeature);
+      } else {
+        geoVectorSource.clear();
+      }
+    });
+    var check_stations = document.getElementById('check_stations');
+    check_stations.addEventListener('change', function(evt) {
+      if(check_stations['checked']) {
+        self.source.addFeatures(self.features);
+      } else {
+        self.source.clear();
+      }
+    });
+    var check_pistes = document.getElementById('check_pistes');
 
 
   }
