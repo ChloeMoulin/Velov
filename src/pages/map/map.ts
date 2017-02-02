@@ -225,6 +225,7 @@ this.buildFeatures();
           }
       });
       view.setCenter(closestStation.getGeometry().getCoordinates());
+      view.setZoom(17);
     }
 
     var button2 = el('getClosestStationBikes');
@@ -234,13 +235,14 @@ this.buildFeatures();
       var line;
       self.features.forEach(function(feature) {
           line = new ol.geom.LineString([feature.getGeometry().getCoordinates(), self.positionFeature.getGeometry().getCoordinates()]);
-          if(line.getLength() < minLength) {
+          if(line.getLength() < minLength && feature.get('available_bikes') > 0) {
             closestStationBikes.setGeometry(feature.getGeometry());
             closestStationBikes.set('name', feature.get('name'));
             minLength = line.getLength();
           }
       });
       view.setCenter(closestStationBikes.getGeometry().getCoordinates());
+      view.setZoom(17);      
     }
 
     var button3 = el('getClosestStationStands');
@@ -250,13 +252,14 @@ this.buildFeatures();
       var line;
       self.features.forEach(function(feature) {
           line = new ol.geom.LineString([feature.getGeometry().getCoordinates(), self.positionFeature.getGeometry().getCoordinates()]);
-          if(line.getLength() < minLength) {
+          if(line.getLength() < minLength && feature.get('available_bike_stands') > 0) {
             closestStationStands.setGeometry(feature.getGeometry());
             closestStationStands.set('name', feature.get('name'));
             minLength = line.getLength();
           }
       });
       view.setCenter(closestStationStands.getGeometry().getCoordinates());
+      view.setZoom(17);
     }
 
     this.olMap.addOverlay(popup);
@@ -267,7 +270,7 @@ this.buildFeatures();
             return feature;
           });
       if (feature) {
-        container.innerHTML = "Bonjour";
+        container.innerHTML = "<p>Bonjour</p>";
         popup.setPosition(evt.coordinate);
 
       } else {
