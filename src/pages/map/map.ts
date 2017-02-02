@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { MarkerService } from '../../models/marker.service';
 import { GlobalMarkersService} from '../../models/globalMarkers.service';
+import { BikePathService } from '../../models/bikePath.service';
+import { GlobalBikePathsService} from '../../models/globalBikePaths.service';
 import { NavController } from 'ionic-angular';
 import { GoogleMap, GoogleMapsEvent, GoogleMapsLatLng } from 'ionic-native';
 
@@ -20,48 +22,89 @@ export class MapPage {
 
   olMap: any;
   style: any;
-  features: any[];
+  marker_features: any[];
+  bike_path_features: any[];
   markers: any[];
+  bike_paths: any[];
   source: any;
+  source_path: any;
 
-  constructor(public navCtrl: NavController,private markerService: MarkerService, private globalMarkersService: GlobalMarkersService) {
+  constructor(public navCtrl: NavController,private markerService: MarkerService, private globalMarkersService: GlobalMarkersService, private bikePathService: BikePathService, private globalBikePathsService: GlobalBikePathsService) {
 
     this.markers = globalMarkersService.getMarkers();
-    this.features = [];
+    this.marker_features = [];
+
+    this.bike_paths = globalBikePathsService.getBikePaths();
+    this.bike_path_features = [];
+
+
 
 
   }
 
-  buildFeatures() {
+  buildBikePathFeatures() {
+    var style = new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: '#4AA440',
+        width: 5
+      }),
+
+    });
+
+    for(let bikePath in this.bike_paths) {
+
+      var path = new ol.geom.LineString();
+      for(let coordinates in this.bike_paths[bikePath].geometry.coordinates) {
+        var coord = this.bike_paths[bikePath].geometry.coordinates[coordinates];
+        var coord2 = ol.proj.transform(coord, 'EPSG:4326','EPSG:3857');
+
+        path.appendCoordinate(coord2);
+      }
+      var feature = new ol.Feature({
+        geometry: path
+      });
+      feature.set("name","bikePath");
+      feature.setStyle(style);
+      this.bike_path_features.push(feature);
+
+    }
+  }
+
+  buildMarkerFeatures() {
     var iconStyle100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker100.png'
-      }))
+      })),
+      zIndex:2000
     });
     var iconStyle75 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker75.png'
-      }))
+      })),
+      zIndex:2000
     });
     var iconStyle50 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker50.png'
-      }))
+      })),
+      zIndex:2000
     });
     var iconStyle25 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker25.png'
-      }))
+      })),
+      zIndex:2000
     });
     var iconStyle0 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker0.png'
-      }))
+      })),
+      zIndex:2000
     });
     for(let marker in this.markers){
 
@@ -90,7 +133,7 @@ export class MapPage {
       } else {
         feature.setStyle(iconStyle100);
       }
-      this.features.push(feature);
+      this.marker_features.push(feature);
     }
   }
 
@@ -99,17 +142,18 @@ export class MapPage {
     var self = this;
 
 
-this.buildFeatures();
+this.buildMarkerFeatures();
+this.buildBikePathFeatures();
   this.source = new ol.source.Vector({
-    features: this.features
-  })
+    features: this.marker_features
+  });
 
-
-
-
+this.source_path = new ol.source.Vector({
+  features: this.bike_path_features
+});
   var view = new ol.View({
     center: ol.proj.transform([4.8323750495910645,45.7574933281114], 'EPSG:4326','EPSG:3857'),
-    zoom: 13,
+    zoom: 13 ,
     minZoom: 12,
     maxZoom: 20
   });
@@ -172,17 +216,21 @@ this.buildFeatures();
 
 
 
+
+
     this.olMap = new ol.Map({
       target:"map",
 
-      layers: [
-        new ol.layer.Tile({
+      layers: [new ol.layer.Tile({
           source:new ol.source.OSM()
         }),
         new ol.layer.Vector({
               source: this.source
             }),
-            geoVector
+            geoVector,
+        new ol.layer.Vector({
+            source: this.source_path
+        })
       ],
       controls: ol.control.defaults({
         attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
@@ -206,7 +254,7 @@ this.buildFeatures();
           function(feature, layer) {
             return feature;
           });
-      if (feature) {
+      if (feature && !(feature.get("name")=="bikePath")) {
         if(feature.get("name")=="self") {
           container.innerHTML="<p id ='title1' display='inline-block'> C'est vous ! </p>";
         } else {
@@ -237,13 +285,19 @@ this.buildFeatures();
     var check_stations = document.getElementById('check_stations');
     check_stations.addEventListener('change', function(evt) {
       if(check_stations['checked']) {
-        self.source.addFeatures(self.features);
+        self.source.addFeatures(self.marker_features);
       } else {
         self.source.clear();
       }
     });
-    var bike_paths = document.getElementById('bike_paths');
-
+    var check_bike_paths = document.getElementById('check_bike_paths');
+    check_bike_paths.addEventListener('change', function(evt) {
+      if(check_bike_paths['checked']) {
+        self.source_path.addFeatures(self.bike_path_features);
+      } else {
+        self.source_path.clear();
+      }
+    });
 
   }
 
