@@ -23,12 +23,12 @@ export class MapPage {
   features: any[];
   markers: any[];
   source: any;
+  positionFeature: any;
 
   constructor(public navCtrl: NavController,private mapService: MapService, private globalMarkersService: GlobalMarkersService) {
 
     this.markers = globalMarkersService.getMarkers();
     this.features = [];
-
 
   }
 
@@ -67,8 +67,12 @@ export class MapPage {
       var feature = new ol.Feature();
       var ratio = this.markers[marker].properties.available_bikes/this.markers[marker].properties.bike_stands;
       var coordinates = this.markers[marker].geometry.coordinates;
+      var name = this.markers[marker].properties.name;
       var point = new ol.geom.Point(ol.proj.transform(coordinates, 'EPSG:4326','EPSG:3857'));
       feature.setGeometry(point);
+      feature.set('name', name);
+      feature.set('available_bikes', this.markers[marker].properties.available_bikes);
+      feature.set('available_bike_stands', this.markers[marker].properties.available_bike_stands);
       if(this.markers[marker].properties.available_bikes == 0) {
         feature.setStyle(iconStyle0);
       } else if (ratio <= 0.25){
@@ -85,7 +89,7 @@ export class MapPage {
   }
 
   ionViewDidLoad() {
-
+    this.positionFeature = new ol.Feature();
     var self = this;
     this.style = new ol.style.Style({
         image: new ol.style.Circle({
@@ -166,6 +170,7 @@ this.buildFeatures();
     geolocation.on('change:position', function() {
       var coordinates = geolocation.getPosition();
       positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
+      self.positionFeature.setGeometry(positionFeature.getGeometry());
       view.setCenter(coordinates);
       view.setZoom(16);
     });
@@ -200,12 +205,59 @@ this.buildFeatures();
       view: view
     });
 
-
     var popup = new ol.Overlay({
       element: document.getElementById('popup'),
       positioning: 'bottom-center',
       stopEvent: false
     });
+
+    var button1 = el('getClosestStation');
+    var closestStation = new ol.Feature();
+    button1.onclick = function() {
+      var minLength = 10000000;
+      var line;
+      self.features.forEach(function(feature) {
+          line = new ol.geom.LineString([feature.getGeometry().getCoordinates(), self.positionFeature.getGeometry().getCoordinates()]);
+          if(line.getLength() < minLength) {
+            closestStation.setGeometry(feature.getGeometry());
+            closestStation.set('name', feature.get('name'));
+            minLength = line.getLength();
+          }
+      });
+      view.setCenter(closestStation.getGeometry().getCoordinates());
+    }
+
+    var button2 = el('getClosestStationBikes');
+    var closestStationBikes = new ol.Feature();
+    button2.onclick = function() {
+      var minLength = 10000000;
+      var line;
+      self.features.forEach(function(feature) {
+          line = new ol.geom.LineString([feature.getGeometry().getCoordinates(), self.positionFeature.getGeometry().getCoordinates()]);
+          if(line.getLength() < minLength) {
+            closestStationBikes.setGeometry(feature.getGeometry());
+            closestStationBikes.set('name', feature.get('name'));
+            minLength = line.getLength();
+          }
+      });
+      view.setCenter(closestStationBikes.getGeometry().getCoordinates());
+    }
+
+    var button3 = el('getClosestStationStands');
+    var closestStationStands = new ol.Feature();
+    button3.onclick = function() {
+      var minLength = 10000000;
+      var line;
+      self.features.forEach(function(feature) {
+          line = new ol.geom.LineString([feature.getGeometry().getCoordinates(), self.positionFeature.getGeometry().getCoordinates()]);
+          if(line.getLength() < minLength) {
+            closestStationStands.setGeometry(feature.getGeometry());
+            closestStationStands.set('name', feature.get('name'));
+            minLength = line.getLength();
+          }
+      });
+      view.setCenter(closestStationStands.getGeometry().getCoordinates());
+    }
 
     this.olMap.addOverlay(popup);
     this.olMap.on('click', function(evt) {
