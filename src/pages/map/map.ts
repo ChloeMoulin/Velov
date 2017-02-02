@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MapService } from '../../models/map.service';
+import { MarkerService } from '../../models/marker.service';
 import { GlobalMarkersService} from '../../models/globalMarkers.service';
 import { NavController } from 'ionic-angular';
 import { GoogleMap, GoogleMapsEvent, GoogleMapsLatLng } from 'ionic-native';
@@ -24,7 +24,7 @@ export class MapPage {
   markers: any[];
   source: any;
 
-  constructor(public navCtrl: NavController,private mapService: MapService, private globalMarkersService: GlobalMarkersService) {
+  constructor(public navCtrl: NavController,private markerService: MarkerService, private globalMarkersService: GlobalMarkersService) {
 
     this.markers = globalMarkersService.getMarkers();
     this.features = [];
@@ -162,9 +162,11 @@ this.buildFeatures();
     var geoVectorSource = new ol.source.Vector({
       features: [positionFeature]
     });
+
     var geoVector = new ol.layer.Vector({
       source: geoVectorSource
     });
+
 
     var element = document.getElementById('popup');
 
@@ -240,7 +242,7 @@ this.buildFeatures();
         self.source.clear();
       }
     });
-    var check_pistes = document.getElementById('check_pistes');
+    var bike_paths = document.getElementById('bike_paths');
 
 
   }

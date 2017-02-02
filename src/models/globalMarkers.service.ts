@@ -11,7 +11,7 @@ export class GlobalMarkersService {
   }
 
   getMarkers() : any[] {
-    return this.markers
+    return this.markers;
   }
 
   setMarkers(newMarkers: any) {
