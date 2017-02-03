@@ -46,29 +46,45 @@ export class MapPage {
     var style = new ol.style.Style({
       stroke: new ol.style.Stroke({
         color: '#4AA440',
-        width: 5
+        width: 2
       }),
 
     });
-
     for(let bikePath in this.bike_paths) {
-
+      var test = this.bike_paths[bikePath].geometry.coordinates;
       var path = new ol.geom.LineString();
-      for(let coordinates in this.bike_paths[bikePath].geometry.coordinates) {
-        var coord = this.bike_paths[bikePath].geometry.coordinates[coordinates];
-        var coord2 = ol.proj.transform(coord, 'EPSG:4326','EPSG:3857');
+      if (this.bike_paths[bikePath].geometry.type == "LineString") {
+        for(let coordinates in this.bike_paths[bikePath].geometry.coordinates) {
+          var coord = this.bike_paths[bikePath].geometry.coordinates[coordinates];
+          var coord2 = ol.proj.transform(coord, 'EPSG:4326','EPSG:3857');
 
-        path.appendCoordinate(coord2);
-      }
-      var feature = new ol.Feature({
-        geometry: path
-      });
-      feature.set("name","bikePath");
-      feature.setStyle(style);
-      this.bike_path_features.push(feature);
+          path.appendCoordinate(coord2);
+        }
+        var feature = new ol.Feature({
+          geometry: path
+        })
+        feature.set("name","bikePath");
+        feature.setStyle(style);
+        this.bike_path_features.push(feature);
+      } else if (this.bike_paths[bikePath].geometry.type == "MultiLineString") {
+        for(let coordinates in this.bike_paths[bikePath].geometry.coordinates) {
+          for(let subcoordinates in this.bike_paths[bikePath].geometry.coordinates[coordinates]) {
+            var coord = this.bike_paths[bikePath].geometry.coordinates[coordinates][subcoordinates];
+            var coord2 = ol.proj.transform(coord, 'EPSG:4326','EPSG:3857');
+
+            path.appendCoordinate(coord2);
+          }
+          var feature = new ol.Feature({
+            geometry: path
+          })
+          feature.set("name","bikePath");
+          feature.setStyle(style);
+          this.bike_path_features.push(feature);
+          }
 
     }
   }
+}
 
   buildMarkerFeatures() {
     var iconStyle100 = new ol.style.Style({
@@ -225,12 +241,13 @@ this.source_path = new ol.source.Vector({
           source:new ol.source.OSM()
         }),
         new ol.layer.Vector({
+            source: this.source_path
+        }),
+        new ol.layer.Vector({
               source: this.source
             }),
-            geoVector,
-        new ol.layer.Vector({
-            source: this.source_path
-        })
+            geoVector
+
       ],
       controls: ol.control.defaults({
         attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
