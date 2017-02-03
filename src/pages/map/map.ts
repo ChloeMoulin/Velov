@@ -94,27 +94,35 @@ export class MapPage {
       })),
       zIndex:2000
     });
-    var iconStyle75 = new ol.style.Style({
+    var iconStyle75_100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker75.png'
+        src: '../../assets/icon/Marker75-100.png'
       })),
       zIndex:2000
     });
-    var iconStyle50 = new ol.style.Style({
+    var iconStyle50_75 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker50.png'
+        src: '../../assets/icon/Marker50-75.png'
       })),
       zIndex:2000
     });
-    var iconStyle25 = new ol.style.Style({
+    var iconStyle25_50 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker25.png'
+        src: '../../assets/icon/Marker25-50.png'
       })),
       zIndex:2000
     });
+    var iconStyle0_25 = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker0-25.png'
+      })),
+      zIndex:2000
+    });
+
     var iconStyle0 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
@@ -141,11 +149,13 @@ export class MapPage {
       if(this.markers[marker].properties.available_bikes == 0) {
         feature.setStyle(iconStyle0);
       } else if (ratio <= 0.25){
-        feature.setStyle(iconStyle25);
+        feature.setStyle(iconStyle0_25);
       } else if (ratio <= 0.5) {
-        feature.setStyle(iconStyle50);
+        feature.setStyle(iconStyle25_50);
       } else if (ratio <= 0.75) {
-        feature.setStyle(iconStyle75);
+        feature.setStyle(iconStyle50_75);
+      } else if (ratio < 1) {
+        feature.setStyle(iconStyle75_100);
       } else {
         feature.setStyle(iconStyle100);
       }
