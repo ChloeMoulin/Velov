@@ -90,35 +90,40 @@ export class MapPage {
     var iconStyle100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker100.png'
+        src: '../../assets/icon/Marker100.png',
+        anchor: [0.5,1]
       })),
       zIndex:2000
     });
     var iconStyle75_100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker75-100.png'
+        src: '../../assets/icon/Marker75-100.png',
+        anchor: [0.5,1]
       })),
       zIndex:2000
     });
     var iconStyle50_75 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker50-75.png'
+        src: '../../assets/icon/Marker50-75.png',
+        anchor: [0.5,1]
       })),
       zIndex:2000
     });
     var iconStyle25_50 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker25-50.png'
+        src: '../../assets/icon/Marker25-50.png',
+        anchor: [0.5,1]
       })),
       zIndex:2000
     });
     var iconStyle0_25 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0-25.png'
+        src: '../../assets/icon/Marker0-25.png',
+        anchor: [0.5,1]
       })),
       zIndex:2000
     });
@@ -126,7 +131,8 @@ export class MapPage {
     var iconStyle0 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0.png'
+        src: '../../assets/icon/Marker0.png',
+        anchor: [0.5,1]
       })),
       zIndex:2000
     });
@@ -216,7 +222,8 @@ this.source_path = new ol.source.Vector({
     positionFeature.setStyle(new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/self.png'
+        src: '../../assets/icon/self.png',
+        anchor: [0.5,1]
       }))
     }));
 
@@ -270,8 +277,9 @@ this.source_path = new ol.source.Vector({
 
     var popup = new ol.Overlay({
       element: document.getElementById('popup'),
-      positioning: 'bottom-center',
-      stopEvent: false
+      positioning: 'bottom-left',
+      stopEvent: false,
+      autoPan: true
     });
 
     this.olMap.addOverlay(popup);
@@ -293,7 +301,8 @@ this.source_path = new ol.source.Vector({
           container.innerHTML += "</div>";
 
         }
-        popup.setPosition(evt.coordinate);
+        popup.setOffset([feature.getStyle().getImage().getSize()[0]/2, - feature.getStyle().getImage().getSize()[1]]);
+        popup.setPosition(feature.getGeometry().getCoordinates());
 
       } else {
         container.innerHTML = "";
