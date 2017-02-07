@@ -319,7 +319,7 @@ this.source_path = new ol.source.Vector({
           }
       });
       view.setCenter(closestStationBikes.getGeometry().getCoordinates());
-      view.setZoom(18);      
+      view.setZoom(18);
     }
 
     var button3 = el('getClosestStationStands');
@@ -339,6 +339,16 @@ this.source_path = new ol.source.Vector({
       view.setZoom(18);
     }
 
+    this.olMap.on('pointermove', function(evt) {
+      var hit = self.olMap.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+          return true;
+      });
+      if (hit) {
+          this.getTargetElement().style.cursor = 'pointer';
+      } else {
+          this.getTargetElement().style.cursor = '';
+      }
+  });
     this.olMap.addOverlay(popup);
     this.olMap.on('click', function(evt) {
       var container = document.getElementById('popup');
@@ -348,7 +358,9 @@ this.source_path = new ol.source.Vector({
           });
 
 
-      if (feature && !(feature.get("name")=="bikePath")) {
+      if (feature && !(feature.get("name")=="bikePath") && (!popup.getPosition() || feature.getGeometry().getCoordinates()[0]!=popup.getPosition()[0] || feature.getGeometry().getCoordinates()[1]!=popup.getPosition()[1])) {
+        var bwah = feature.getGeometry().getCoordinates();
+        var bwoh = popup.getPosition();
         if(feature.get("name")=="self") {
           container.innerHTML="<p id ='title1' display='inline-block'> C'est vous ! </p>";
         } else {
