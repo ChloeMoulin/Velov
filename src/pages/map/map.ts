@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { MapService } from '../../models/map.service';
+import { MarkerService } from '../../models/marker.service';
 import { GlobalMarkersService} from '../../models/globalMarkers.service';
+import { BikePathService } from '../../models/bikePath.service';
+import { GlobalBikePathsService} from '../../models/globalBikePaths.service';
 import { NavController } from 'ionic-angular';
 import { GoogleMap, GoogleMapsEvent, GoogleMapsLatLng } from 'ionic-native';
 
@@ -20,55 +22,141 @@ export class MapPage {
 
   olMap: any;
   style: any;
-  features: any[];
+  marker_features: any[];
+  bike_path_features: any[];
   markers: any[];
+  bike_paths: any[];
   source: any;
   positionFeature: any;
+  source_path: any;
 
-  constructor(public navCtrl: NavController,private mapService: MapService, private globalMarkersService: GlobalMarkersService) {
+
+  constructor(public navCtrl: NavController,private markerService: MarkerService, private globalMarkersService: GlobalMarkersService, private bikePathService: BikePathService, private globalBikePathsService: GlobalBikePathsService) {
 
     this.markers = globalMarkersService.getMarkers();
-    this.features = [];
+    this.marker_features = [];
+
+
+    this.bike_paths = globalBikePathsService.getBikePaths();
+    this.bike_path_features = [];
+
+
+
 
   }
 
-  buildFeatures() {
+  buildBikePathFeatures() {
+    var style = new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: '#4AA440',
+        width: 2
+      }),
+
+    });
+    for(let bikePath in this.bike_paths) {
+      var test = this.bike_paths[bikePath].geometry.coordinates;
+      var path = new ol.geom.LineString();
+      if (this.bike_paths[bikePath].geometry.type == "LineString") {
+        for(let coordinates in this.bike_paths[bikePath].geometry.coordinates) {
+          var coord = this.bike_paths[bikePath].geometry.coordinates[coordinates];
+          var coord2 = ol.proj.transform(coord, 'EPSG:4326','EPSG:3857');
+
+          path.appendCoordinate(coord2);
+        }
+        var feature = new ol.Feature({
+          geometry: path
+        })
+        feature.set("name","bikePath");
+        feature.setStyle(style);
+        this.bike_path_features.push(feature);
+      } else if (this.bike_paths[bikePath].geometry.type == "MultiLineString") {
+        for(let coordinates in this.bike_paths[bikePath].geometry.coordinates) {
+          for(let subcoordinates in this.bike_paths[bikePath].geometry.coordinates[coordinates]) {
+            var coord = this.bike_paths[bikePath].geometry.coordinates[coordinates][subcoordinates];
+            var coord2 = ol.proj.transform(coord, 'EPSG:4326','EPSG:3857');
+
+            path.appendCoordinate(coord2);
+          }
+          var feature = new ol.Feature({
+            geometry: path
+          })
+          feature.set("name","bikePath");
+          feature.setStyle(style);
+          this.bike_path_features.push(feature);
+          }
+
+    }
+
+  }
+}
+
+  buildMarkerFeatures() {
     var iconStyle100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker100.png'
-      }))
+        src: '../../assets/icon/Marker100.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
     });
-    var iconStyle75 = new ol.style.Style({
+    var iconStyle75_100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker75.png'
-      }))
+        src: '../../assets/icon/Marker75-100.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
     });
-    var iconStyle50 = new ol.style.Style({
+    var iconStyle50_75 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker50.png'
-      }))
+        src: '../../assets/icon/Marker50-75.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
     });
-    var iconStyle25 = new ol.style.Style({
+    var iconStyle25_50 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker25.png'
-      }))
+        src: '../../assets/icon/Marker25-50.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
     });
+    var iconStyle0_25 = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker0-25.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
+    });
+
     var iconStyle0 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0.png'
-      }))
+        src: '../../assets/icon/Marker0.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
     });
     for(let marker in this.markers){
-      var feature = new ol.Feature();
+
       var ratio = this.markers[marker].properties.available_bikes/this.markers[marker].properties.bike_stands;
       var coordinates = this.markers[marker].geometry.coordinates;
       var name = this.markers[marker].properties.name;
+
+      var address = this.markers[marker].properties.address;
+      var city = this.markers[marker].properties.commune;
+      var available_bikes = this.markers[marker].properties.available_bikes;
+      var available_bike_stands = this.markers[marker].properties.available_bike_stands;
+
       var point = new ol.geom.Point(ol.proj.transform(coordinates, 'EPSG:4326','EPSG:3857'));
+      var feature = new ol.Feature();
+      feature.set("name",name + " - "+city);
+      feature.set("address",address);
+      feature.set("available_bikes", available_bikes);
+      feature.set("available_bike_stands",available_bike_stands);
       feature.setGeometry(point);
       feature.set('name', name);
       feature.set('available_bikes', this.markers[marker].properties.available_bikes);
@@ -76,46 +164,37 @@ export class MapPage {
       if(this.markers[marker].properties.available_bikes == 0) {
         feature.setStyle(iconStyle0);
       } else if (ratio <= 0.25){
-        feature.setStyle(iconStyle25);
+        feature.setStyle(iconStyle0_25);
       } else if (ratio <= 0.5) {
-        feature.setStyle(iconStyle50);
+        feature.setStyle(iconStyle25_50);
       } else if (ratio <= 0.75) {
-        feature.setStyle(iconStyle75);
+        feature.setStyle(iconStyle50_75);
+      } else if (ratio < 1) {
+        feature.setStyle(iconStyle75_100);
       } else {
         feature.setStyle(iconStyle100);
       }
-      this.features.push(feature);
+      this.marker_features.push(feature);
     }
   }
 
   ionViewDidLoad() {
     this.positionFeature = new ol.Feature();
     var self = this;
-    this.style = new ol.style.Style({
-        image: new ol.style.Circle({
-          radius: 6,
-          fill: new ol.style.Fill({
-            color: '#3399CC'
-          }),
-          stroke: new ol.style.Stroke({
-            color: '#fff',
-            width: 2
-          })
-        })
-      });
 
 
-this.buildFeatures();
+this.buildMarkerFeatures();
+this.buildBikePathFeatures();
   this.source = new ol.source.Vector({
-    features: this.features
-  })
+    features: this.marker_features
+  });
 
-
-
-
+this.source_path = new ol.source.Vector({
+  features: this.bike_path_features
+});
   var view = new ol.View({
     center: ol.proj.transform([4.8323750495910645,45.7574933281114], 'EPSG:4326','EPSG:3857'),
-    zoom: 13,
+    zoom: 13 ,
     minZoom: 12,
     maxZoom: 20
   });
@@ -148,24 +227,16 @@ this.buildFeatures();
       info.style.display = '';
     });
 
-    var accuracyFeature = new ol.Feature();
-    geolocation.on('change:accuracyGeometry', function() {
-      accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
-    });
-
     var positionFeature = new ol.Feature();
     positionFeature.setStyle(new ol.style.Style({
-      image: new ol.style.Circle({
-        radius: 6,
-        fill: new ol.style.Fill({
-          color: '#FF0000'
-        }),
-        stroke: new ol.style.Stroke({
-          color: '#fff',
-          width: 2
-        })
-      })
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/self.png',
+        anchor: [0.5,1]
+      }))
     }));
+
+    positionFeature.set("name","self");
 
     geolocation.on('change:position', function() {
       var coordinates = geolocation.getPosition();
@@ -175,27 +246,35 @@ this.buildFeatures();
       view.setZoom(16);
     });
 
-    var geoVector = new ol.layer.Vector({
-      source: new ol.source.Vector({
-        features: [accuracyFeature, positionFeature]
-      })
+    var geoVectorSource = new ol.source.Vector({
+      features: [positionFeature]
     });
 
+    var geoVector = new ol.layer.Vector({
+      source: geoVectorSource
+    });
+
+
     var element = document.getElementById('popup');
+
+
 
 
 
     this.olMap = new ol.Map({
       target:"map",
 
-      layers: [
-        new ol.layer.Tile({
+      layers: [new ol.layer.Tile({
           source:new ol.source.OSM()
+        }),
+        new ol.layer.Vector({
+            source: this.source_path
         }),
         new ol.layer.Vector({
               source: this.source
             }),
             geoVector
+
       ],
       controls: ol.control.defaults({
         attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
@@ -207,8 +286,9 @@ this.buildFeatures();
 
     var popup = new ol.Overlay({
       element: document.getElementById('popup'),
-      positioning: 'bottom-center',
-      stopEvent: false
+      positioning: 'bottom-left',
+      stopEvent: false,
+      autoPan: true
     });
 
     var button1 = el('getClosestStation');
@@ -216,7 +296,7 @@ this.buildFeatures();
     button1.onclick = function() {
       var minLength = 10000000;
       var line;
-      self.features.forEach(function(feature) {
+      self.marker_features.forEach(function(feature) {
           line = new ol.geom.LineString([feature.getGeometry().getCoordinates(), self.positionFeature.getGeometry().getCoordinates()]);
           if(line.getLength() < minLength) {
             closestStation.setGeometry(feature.getGeometry());
@@ -233,7 +313,7 @@ this.buildFeatures();
     button2.onclick = function() {
       var minLength = 10000000;
       var line;
-      self.features.forEach(function(feature) {
+      self.marker_features.forEach(function(feature) {
           line = new ol.geom.LineString([feature.getGeometry().getCoordinates(), self.positionFeature.getGeometry().getCoordinates()]);
           if(line.getLength() < minLength && feature.get('available_bikes') > 0) {
             closestStationBikes.setGeometry(feature.getGeometry());
@@ -250,7 +330,7 @@ this.buildFeatures();
     button3.onclick = function() {
       var minLength = 10000000;
       var line;
-      self.features.forEach(function(feature) {
+      self.marker_features.forEach(function(feature) {
           line = new ol.geom.LineString([feature.getGeometry().getCoordinates(), self.positionFeature.getGeometry().getCoordinates()]);
           if(line.getLength() < minLength && feature.get('available_bike_stands') > 0) {
             closestStationStands.setGeometry(feature.getGeometry());
@@ -269,9 +349,23 @@ this.buildFeatures();
           function(feature, layer) {
             return feature;
           });
-      if (feature) {
-        container.innerHTML = "<p>Bonjour</p>";
-        popup.setPosition(evt.coordinate);
+
+
+      if (feature && !(feature.get("name")=="bikePath")) {
+        if(feature.get("name")=="self") {
+          container.innerHTML="<p id ='title1' display='inline-block'> C'est vous ! </p>";
+        } else {
+          container.innerHTML =  "<p id='title1' display='inline-block'>"+feature.get("name")+"</p>";
+          container.innerHTML += "<p id ='title2' display='inline-block'>"+feature.get("address")+"</p><br/>";
+          container.innerHTML += "<div id='infos'>";
+          container.innerHTML += "<p><span id='subtitle'> Vélos disponibles : </span>"+feature.get("available_bikes")+"</p>";
+          container.innerHTML += "<p><span id='subtitle'> Emplacements disponibles : </span>"+feature.get("available_bike_stands")+"</p>";
+          container.innerHTML += "</div>";
+
+        }
+        popup.setOffset([feature.getStyle().getImage().getSize()[0]/2, - feature.getStyle().getImage().getSize()[1]]);
+        popup.setPosition(feature.getGeometry().getCoordinates());
+
 
       } else {
         container.innerHTML = "";
@@ -279,6 +373,30 @@ this.buildFeatures();
       }
     });
 
+    var check_self = document.getElementById('check_self');
+    check_self.addEventListener('change', function(evt) {
+      if(check_self['checked']) {
+        geoVectorSource.addFeature(positionFeature);
+      } else {
+        geoVectorSource.clear();
+      }
+    });
+    var check_stations = document.getElementById('check_stations');
+    check_stations.addEventListener('change', function(evt) {
+      if(check_stations['checked']) {
+        self.source.addFeatures(self.marker_features);
+      } else {
+        self.source.clear();
+      }
+    });
+    var check_bike_paths = document.getElementById('check_bike_paths');
+    check_bike_paths.addEventListener('change', function(evt) {
+      if(check_bike_paths['checked']) {
+        self.source_path.addFeatures(self.bike_path_features);
+      } else {
+        self.source_path.clear();
+      }
+    });
 
   }
 

@@ -4,7 +4,7 @@
 
 
   @Injectable()
-  export class MapService {
+  export class MarkerService {
 
     private markersURL = 'https://download.data.grandlyon.com/wfs/rdata?SERVICE=WFS&VERSION=2.0.0&outputformat=GEOJSON&request=GetFeature&typename=jcd_jcdecaux.jcdvelov&SRSNAME=urn:ogc:def:crs:EPSG::4171';
 
