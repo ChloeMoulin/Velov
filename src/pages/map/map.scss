@@ -33,3 +33,16 @@
   background-color: rgba(0, 60, 136, 0.498039);
 }
 
+#search_stations{
+  padding:10px;
+  position:absolute;
+  right:10px;
+  top:150px;
+  z-index:10000;
+  color:#FFF;
+  background-color: rgba(0, 60, 136, 0.498039);
+}
+
+button{
+  background-color:transparent;
+}
