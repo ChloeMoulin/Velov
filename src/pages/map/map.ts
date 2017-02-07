@@ -158,10 +158,7 @@ export class MapPage {
       feature.set("available_bikes", available_bikes);
       feature.set("available_bike_stands",available_bike_stands);
       feature.setGeometry(point);
-      feature.set('name', name);
-      feature.set('available_bikes', this.markers[marker].properties.available_bikes);
-      feature.set('available_bike_stands', this.markers[marker].properties.available_bike_stands);
-      if(this.markers[marker].properties.available_bikes == 0) {
+      if(available_bikes == 0) {
         feature.setStyle(iconStyle0);
       } else if (ratio <= 0.25){
         feature.setStyle(iconStyle0_25);
