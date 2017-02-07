@@ -225,7 +225,7 @@ this.buildFeatures();
           }
       });
       view.setCenter(closestStation.getGeometry().getCoordinates());
-      view.setZoom(17);
+      view.setZoom(18);
     }
 
     var button2 = el('getClosestStationBikes');
@@ -242,7 +242,7 @@ this.buildFeatures();
           }
       });
       view.setCenter(closestStationBikes.getGeometry().getCoordinates());
-      view.setZoom(17);      
+      view.setZoom(18);      
     }
 
     var button3 = el('getClosestStationStands');
@@ -259,7 +259,7 @@ this.buildFeatures();
           }
       });
       view.setCenter(closestStationStands.getGeometry().getCoordinates());
-      view.setZoom(17);
+      view.setZoom(18);
     }
 
     this.olMap.addOverlay(popup);
