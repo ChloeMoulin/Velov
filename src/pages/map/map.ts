@@ -45,6 +45,24 @@ export class MapPage {
 
   }
 
+  manageFavourite(feature,element) {
+    var self = this;
+    var storage = window.localStorage;
+    if(storage.getItem(feature.get('number')) === null) {
+      storage.setItem(feature.get("number"), feature.get("name"));
+      document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Retirer des favoris : </span><img id='check_favourite' src='../../assets/icon/star_full.png' alt='star' /></p>";
+      document.getElementById("popup").style.boxShadow = "1px 1px 12px #F8E511;"
+    } else {
+      storage.removeItem(feature.get("number"));
+      document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='../../assets/icon/star_empty.png' alt='star'/></p>";
+      document.getElementById("popup").style.boxShadow = "1px 1px 12px #555;"
+    }
+    var check_favourite = document.getElementById('check_favourite');
+    check_favourite.addEventListener('click', function(evt) {
+      self.manageFavourite(feature,element);
+    });
+  }
+
   buildBikePathFeatures() {
     var style = new ol.style.Style({
       stroke: new ol.style.Stroke({
@@ -361,8 +379,6 @@ this.source_path = new ol.source.Vector({
 
 
       if (feature && !(feature.get("name")=="bikePath") && (!popup.getPosition() || feature.getGeometry().getCoordinates()[0]!=popup.getPosition()[0] || feature.getGeometry().getCoordinates()[1]!=popup.getPosition()[1])) {
-        var bwah = feature.getGeometry().getCoordinates();
-        var bwoh = popup.getPosition();
         if(feature.get("name")=="self") {
           container.innerHTML="<p id ='title1' display='inline-block'> C'est vous ! </p>";
         } else {
@@ -373,18 +389,16 @@ this.source_path = new ol.source.Vector({
           container.innerHTML += "<p><span id='subtitle'> Emplacements disponibles : </span>"+feature.get("available_bike_stands")+"</p>";
           container.innerHTML += "</div>";
           if(storage.getItem(feature.get('number')) === null) {
-            container.innerHTML += "<p><span id='subtitle'> Ajouter aux favoris : </span><input id='check_favourite' type='checkbox'/></p>";
+            container.innerHTML += "<div id=favourite><p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='../../assets/icon/star_empty.png' alt='star' /></p>";
           } else {
-            container.innerHTML += "<p><span id='subtitle'> Retirer des favoris : </span><input id='check_favourite' type='checkbox' checked/></p>";
+            container.innerHTML += "<div id=favourite><p><span id='subtitle'> Retirer des favoris : </span><img id='check_favourite' src='../../assets/icon/star_full.png' alt='star' /></p>";
           }
+
           var check_favourite = document.getElementById('check_favourite');
-          check_favourite.addEventListener('change', function(evt) {
-            if(check_favourite['checked']) {
-              storage.setItem(feature.get("number"), feature.get("name"));
-            } else {
-              storage.removeItem(feature.get("number"));
-            }
+          check_favourite.addEventListener('click', function(evt) {
+            self.manageFavourite(feature,element);
           });
+
         }
         popup.setOffset([feature.getStyle().getImage().getSize()[0]/2, - feature.getStyle().getImage().getSize()[1]]);
         popup.setPosition(feature.getGeometry().getCoordinates());
