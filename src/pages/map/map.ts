@@ -145,7 +145,7 @@ export class MapPage {
       var ratio = this.markers[marker].properties.available_bikes/this.markers[marker].properties.bike_stands;
       var coordinates = this.markers[marker].geometry.coordinates;
       var name = this.markers[marker].properties.name;
-
+      var number = this.markers[marker].properties.number;
       var address = this.markers[marker].properties.address;
       var city = this.markers[marker].properties.commune;
       var available_bikes = this.markers[marker].properties.available_bikes;
@@ -157,6 +157,7 @@ export class MapPage {
       feature.set("address",address);
       feature.set("available_bikes", available_bikes);
       feature.set("available_bike_stands",available_bike_stands);
+      feature.set("number", number);
       feature.setGeometry(point);
       if(available_bikes == 0) {
         feature.setStyle(iconStyle0);
@@ -176,6 +177,7 @@ export class MapPage {
   }
 
   ionViewDidLoad() {
+    var storage = window.localStorage;
     this.positionFeature = new ol.Feature();
     var self = this;
 
@@ -284,7 +286,7 @@ this.source_path = new ol.source.Vector({
     var popup = new ol.Overlay({
       element: document.getElementById('popup'),
       positioning: 'bottom-left',
-      stopEvent: false,
+      stopEvent: true,
       autoPan: true
     });
 
@@ -370,7 +372,19 @@ this.source_path = new ol.source.Vector({
           container.innerHTML += "<p><span id='subtitle'> Vélos disponibles : </span>"+feature.get("available_bikes")+"</p>";
           container.innerHTML += "<p><span id='subtitle'> Emplacements disponibles : </span>"+feature.get("available_bike_stands")+"</p>";
           container.innerHTML += "</div>";
-
+          if(storage.getItem(feature.get('number')) === null) {
+            container.innerHTML += "<p><span id='subtitle'> Ajouter aux favoris : </span><input id='check_favourite' type='checkbox'/></p>";
+          } else {
+            container.innerHTML += "<p><span id='subtitle'> Retirer des favoris : </span><input id='check_favourite' type='checkbox' checked/></p>";
+          }
+          var check_favourite = document.getElementById('check_favourite');
+          check_favourite.addEventListener('change', function(evt) {
+            if(check_favourite['checked']) {
+              storage.setItem(feature.get("number"), feature.get("name"));
+            } else {
+              storage.removeItem(feature.get("number"));
+            }
+          });
         }
         popup.setOffset([feature.getStyle().getImage().getSize()[0]/2, - feature.getStyle().getImage().getSize()[1]]);
         popup.setPosition(feature.getGeometry().getCoordinates());
