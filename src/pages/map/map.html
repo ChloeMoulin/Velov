@@ -7,21 +7,27 @@
 <ion-content>
   <div id="map" #map class="map">
     <div id="select">
-      <input type="checkbox" id="check_self" value="check_self" checked>
-      <label for="check_self">Ma position</label><br/>
-      <input type="checkbox" id="check_stations" value="check_stations" checked>
-      <label for="check_stations">Stations Velov</label><br/>
-      <input type="checkbox" id="check_bike_paths" value="check_bike_paths" checked>
-      <label for="check_bike_paths">Pistes cyclabes</label>
+      <span id="p_check_self" style="display:none">
+        <input type="checkbox" id="check_self" value="check_self" checked>
+        <label for="check_self">Ma position</label><br/>
+      </span>
+      <span id="p_check_stations">
+        <input type="checkbox" id="check_stations" value="check_stations" checked>
+        <label for="check_stations">Stations Velov</label><br/>
+      </span>
+      <span id="p_check_bike_paths">
+        <input type="checkbox" id="check_bike_paths" value="check_bike_paths" checked>
+        <label for="check_bike_paths">Pistes cyclabes</label>
+      </span>
 
     </div>
-    <div id="popup" ></div>
+    <div id="popup" style="display:none" ></div>
     <div id="accuracy" style="display:none"></div>
     <div id="altitude" style="display:none"></div>
     <div id="altitudeAccuracy" style="display:none"></div>
     <div id="heading" style="display:none"></div>
     <div id="speed" style="display:none"></div>
-    <div id="search_stations">
+    <div id="search_stations" style="display:none">
       Chercher une station<br/>
 
       <button id="getClosestStation"><ion-icon name="pin"></ion-icon></button>La plus proche<br/>

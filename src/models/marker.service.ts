@@ -1,6 +1,7 @@
-  import { Injectable } from '@angular/core';
+  import {Injectable } from '@angular/core';
   import {Headers, Http} from '@angular/http';
   import 'rxjs/add/operator/toPromise';
+
 
 
   @Injectable()
@@ -15,6 +16,20 @@
                  .toPromise()
                  .then(response => response.json())
                  .catch(this.handleError);
+    }
+
+    saveMarkers(markers) {
+      var storage = window.localStorage;
+      storage.setItem("MarkersDataSave",JSON.stringify(markers));
+
+
+    }
+
+    loadMarkers() : any {
+      var storage = window.localStorage;
+      if (storage.getItem("MarkersDataSave")=== null)
+        return undefined;
+      return JSON.parse(storage.getItem("MarkersDataSave"));
     }
 
     private handleError(error: any): Promise<any> {
