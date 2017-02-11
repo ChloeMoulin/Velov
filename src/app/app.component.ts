@@ -5,7 +5,6 @@ import { GlobalMarkersService} from '../models/globalMarkers.service'
 import { BikePathService } from '../models/bikePath.service';
 import { GlobalBikePathsService} from '../models/globalBikePaths.service'
 import { StatusBar, Splashscreen } from 'ionic-native';
-import { GoogleMap, GoogleMapsEvent, GoogleMapsLatLng } from 'ionic-native';
 import {Headers, Http} from '@angular/http';
 import {OnInit} from  '@angular/core';
 

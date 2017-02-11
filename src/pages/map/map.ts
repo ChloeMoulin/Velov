@@ -4,7 +4,7 @@ import { GlobalMarkersService} from '../../models/globalMarkers.service';
 import { BikePathService } from '../../models/bikePath.service';
 import { GlobalBikePathsService} from '../../models/globalBikePaths.service';
 import { NavController } from 'ionic-angular';
-import { GoogleMap, GoogleMapsEvent, GoogleMapsLatLng } from 'ionic-native';
+
 
 declare var ol: any;
 
