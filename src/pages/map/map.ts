@@ -36,6 +36,19 @@ export class MapPage {
   gms: any;
   gbps: any;
   could_locate: any;
+  iconStyle100: any;
+  iconStyle75_100: any;
+  iconStyle50_75: any;
+  iconStyle25_50: any;
+  iconStyle0_25: any;
+
+  iconStyle0: any;
+  iconStyle100f: any;
+  iconStyle75_100f: any;
+  iconStyle50_75f: any;
+  iconStyle25_50f: any;
+  iconStyle0_25f: any;
+  iconStyle0f: any;
 
 
 
@@ -235,6 +248,50 @@ export class MapPage {
 
   }
 
+  setFeatureStyle(feature) {
+    var available_bike_stands = feature.get("available_bike_stands");
+    var ratio = feature.get("ratio");
+    var available_bikes = feature.get("available_bikes");
+    var storage = window.localStorage;
+    if(storage.getItem(feature.get('number')) === null) {
+      if(this.markers_state == 2) {
+        feature.setStyle(this.iconStyle100);
+      }else if (available_bike_stands == 0) {
+        feature.setStyle(this.iconStyle100);
+      }else if(available_bikes == 0) {
+        feature.setStyle(this.iconStyle0);
+      } else if (ratio <= 0.25){
+        feature.setStyle(this.iconStyle0_25);
+      } else if (ratio <= 0.5) {
+        feature.setStyle(this.iconStyle25_50);
+      } else if (ratio <= 0.75) {
+        feature.setStyle(this.iconStyle50_75);
+      } else if (ratio < 1) {
+        feature.setStyle(this.iconStyle75_100);
+      } else {
+        feature.setStyle(this.iconStyle100);
+      }
+    } else {
+      if(this.markers_state == 2) {
+        feature.setStyle(this.iconStyle100f);
+      }else if (available_bike_stands == 0) {
+        feature.setStyle(this.iconStyle100f);
+      }else if(available_bikes == 0) {
+        feature.setStyle(this.iconStyle0f);
+      } else if (ratio <= 0.25){
+        feature.setStyle(this.iconStyle0_25f);
+      } else if (ratio <= 0.5) {
+        feature.setStyle(this.iconStyle25_50f);
+      } else if (ratio <= 0.75) {
+        feature.setStyle(this.iconStyle50_75f);
+      } else if (ratio < 1) {
+        feature.setStyle(this.iconStyle75_100f);
+      } else {
+        feature.setStyle(this.iconStyle100f);
+      }
+    }
+  }
+
   manageFavourite(feature,element) {
     var self = this;
     var storage = window.localStorage;
@@ -247,11 +304,14 @@ export class MapPage {
       document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='../../assets/icon/star_empty.png' alt='star'/></p>";
       document.getElementById("popup").style.boxShadow = "1px 1px 12px #555;"
     }
+    this.setFeatureStyle(feature);
     var check_favourite = document.getElementById('check_favourite');
     check_favourite.addEventListener('click', function(evt) {
       self.manageFavourite(feature,element);
     });
   }
+
+
 
   buildBikePathFeatures() {
     var style = new ol.style.Style({
@@ -301,7 +361,8 @@ export class MapPage {
   buildMarkerFeatures() {
     if (this.markers == undefined)
       return;
-    var iconStyle100 = new ol.style.Style({
+
+    this.iconStyle100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker100.png',
@@ -309,7 +370,7 @@ export class MapPage {
       })),
       zIndex:2000
     });
-    var iconStyle75_100 = new ol.style.Style({
+    this.iconStyle75_100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker75-100.png',
@@ -317,7 +378,7 @@ export class MapPage {
       })),
       zIndex:2000
     });
-    var iconStyle50_75 = new ol.style.Style({
+    this.iconStyle50_75 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker50-75.png',
@@ -325,7 +386,7 @@ export class MapPage {
       })),
       zIndex:2000
     });
-    var iconStyle25_50 = new ol.style.Style({
+    this.iconStyle25_50 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker25-50.png',
@@ -333,7 +394,7 @@ export class MapPage {
       })),
       zIndex:2000
     });
-    var iconStyle0_25 = new ol.style.Style({
+    this.iconStyle0_25 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker0-25.png',
@@ -342,10 +403,60 @@ export class MapPage {
       zIndex:2000
     });
 
-    var iconStyle0 = new ol.style.Style({
+    this.iconStyle0 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
         src: '../../assets/icon/Marker0.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
+    });
+
+    this.iconStyle100f = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker100f.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
+    });
+    this.iconStyle75_100f = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker75-100f.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
+    });
+    this.iconStyle50_75f = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker50-75f.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
+    });
+    this.iconStyle25_50f = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker25-50f.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
+    });
+    this.iconStyle0_25f = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker0-25f.png',
+        anchor: [0.5,1]
+      })),
+      zIndex:2000
+    });
+
+    this.iconStyle0f = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: '../../assets/icon/Marker0f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -367,25 +478,11 @@ export class MapPage {
       feature.set("address",address);
       feature.set("available_bikes", available_bikes);
       feature.set("available_bike_stands",available_bike_stands);
+      feature.set("ration",ratio);
       feature.set("number", number);
       feature.setGeometry(point)
-      if(this.markers_state == 2) {
-        feature.setStyle(iconStyle100);
-      }else if (available_bike_stands == 0) {
-        feature.setStyle(iconStyle100);
-      }else if(available_bikes == 0) {
-        feature.setStyle(iconStyle0);
-      } else if (ratio <= 0.25){
-        feature.setStyle(iconStyle0_25);
-      } else if (ratio <= 0.5) {
-        feature.setStyle(iconStyle25_50);
-      } else if (ratio <= 0.75) {
-        feature.setStyle(iconStyle50_75);
-      } else if (ratio < 1) {
-        feature.setStyle(iconStyle75_100);
-      } else {
-        feature.setStyle(iconStyle100);
-      }
+      this.setFeatureStyle(feature);
+
       this.marker_features.push(feature);
     }
   }
