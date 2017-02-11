@@ -3,6 +3,7 @@
   import 'rxjs/add/operator/toPromise';
 
 
+
   @Injectable()
   export class MarkerService {
 
@@ -19,8 +20,16 @@
 
     saveMarkers(markers) {
       var storage = window.localStorage;
+      storage.setItem("MarkersDataSave",JSON.stringify(markers));
 
 
+    }
+
+    loadMarkers() : any {
+      var storage = window.localStorage;
+      if (storage.getItem("MarkersDataSave")=== null)
+        return undefined;
+      return JSON.parse(storage.getItem("MarkersDataSave"));
     }
 
     private handleError(error: any): Promise<any> {

@@ -17,6 +17,20 @@ export class BikePathService {
                .catch(this.handleError);
   }
 
+  saveBikePaths(bikePaths) {
+    var storage = window.localStorage;
+    storage.setItem("BikePathsDataSave",JSON.stringify(bikePaths));
+
+
+  }
+
+  loadBikePaths() : any {
+    var storage = window.localStorage;
+    if (storage.getItem("BikePathsDataSave")=== null)
+      return undefined;
+    return JSON.parse(storage.getItem("BikePathsDataSave"));
+  }
+
   private handleError(error: any): Promise<any> {
     console.error('An error occured', error);
     return Promise.reject(error.message || error);
