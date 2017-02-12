@@ -1,9 +1,15 @@
 import { Component } from '@angular/core';
 import { Platform } from 'ionic-angular';
-import { MarkerService } from '../models/marker.service';
-import { GlobalMarkersService} from '../models/globalMarkers.service'
-import { BikePathService } from '../models/bikePath.service';
-import { GlobalBikePathsService} from '../models/globalBikePaths.service'
+import { MarkerService } from '../models/marker/marker.service';
+import { DisplayMarkerService } from '../models/marker/displayMarker.service';
+import { FavouriteService } from '../models/marker/favourite.service';
+import { MarkerStyleService } from '../models/marker/markerStyle.service';
+import { PopupService } from '../models/marker/popup.service';
+import { GlobalMarkersService} from '../models/marker/globalMarkers.service';
+import { BikePathService } from '../models/bikePath/bikePath.service';
+import { DisplayBikePathService } from '../models/bikePath/displayBikePath.service';
+import { GlobalBikePathsService} from '../models/bikePath/globalBikePaths.service';
+import { GeolocalisationService } from '../models/geolocalisation/geolocalisation.service';
 import { StatusBar, Splashscreen } from 'ionic-native';
 import {Headers, Http} from '@angular/http';
 import {OnInit} from  '@angular/core';
@@ -17,7 +23,7 @@ import { TabsPage } from '../pages/tabs/tabs';
 
 @Component({
   templateUrl: 'app.html',
-  providers: [MarkerService, GlobalMarkersService, BikePathService, GlobalBikePathsService]
+  providers: [MarkerService, GlobalMarkersService, BikePathService, GlobalBikePathsService, DisplayBikePathService, DisplayMarkerService, FavouriteService, MarkerStyleService, PopupService, GeolocalisationService]
 })
 export class MyApp implements OnInit {
   ngOnInit(): void {
