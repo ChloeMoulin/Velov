@@ -510,7 +510,7 @@ export class MapPage {
     if(device.platform =='Android' && !permissions.hasPermission(permissions.ACCESS_COARSE_LOCATION, null, null) && !permissions.hasPermission(permissions.ACCESS_FINE_LOCATION, null, null)) {
       permissions.requestPermission(permissions.ACCESS_COARSE_LOCATION, null, null);
       permissions.requestPermission(permissions.ACCESS_FINE_LOCATION, null, null);
-      navigator.geolocation.getCurrentPosition(changePosition, onError, { timeout: 30000, enableHighAccuracy:true });
+      navigator.geolocation.getCurrentPosition(setPosition, onError, { timeout: 30000, enableHighAccuracy:true });
     }
     var storage = window.localStorage;
     
@@ -519,7 +519,7 @@ export class MapPage {
     this.bikePaths_state = this.gbps.getState();
 
     this.manageGeolocalisation();
-    function changePosition(position){
+    function setPosition(position){
       self.could_locate = true;
       document.getElementById("search_stations").style.display="";
       document.getElementById("p_check_self").style.display="";
@@ -528,7 +528,15 @@ export class MapPage {
       self.view.setCenter(coordinates);
       self.view.setZoom(16);
       self.geoVector.addFeature(self.positionFeature);
+    }
 
+    function changePosition(position){
+      self.could_locate = true;
+      document.getElementById("search_stations").style.display="";
+      document.getElementById("p_check_self").style.display="";
+      var coordinates = ol.proj.transform([position.coords.longitude, position.coords.latitude], 'EPSG:4326', 'EPSG:3857');
+      self.positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
+      self.geoVector.addFeature(self.positionFeature);
     }
 
     function onError(error) {
@@ -549,7 +557,7 @@ export class MapPage {
         maxZoom: 20
       });
 
-      navigator.geolocation.getCurrentPosition(changePosition, onError, { timeout: 30000, enableHighAccuracy:true });
+      navigator.geolocation.getCurrentPosition(setPosition, onError, { timeout: 30000, enableHighAccuracy:true });
       navigator.geolocation.watchPosition(changePosition, onError, { timeout: 30000, enableHighAccuracy:true });
       this.positionFeature.setStyle(new ol.style.Style({
         image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
