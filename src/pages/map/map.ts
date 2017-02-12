@@ -7,7 +7,8 @@ import { NavController } from 'ionic-angular';
 
 
 declare var ol: any;
-
+declare var cordova: any;
+declare var device: any;
 
 @Component({
   selector: 'page-map',
@@ -49,6 +50,8 @@ export class MapPage {
   iconStyle25_50f: any;
   iconStyle0_25f: any;
   iconStyle0f: any;
+
+  coordinates: any;
 
 
 
@@ -365,7 +368,7 @@ export class MapPage {
     this.iconStyle100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker100.png',
+        src: 'assets/icon/Marker100.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -373,7 +376,7 @@ export class MapPage {
     this.iconStyle75_100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker75-100.png',
+        src: 'assets/icon/Marker75-100.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -381,7 +384,7 @@ export class MapPage {
     this.iconStyle50_75 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker50-75.png',
+        src: 'assets/icon/Marker50-75.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -389,7 +392,7 @@ export class MapPage {
     this.iconStyle25_50 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker25-50.png',
+        src: 'assets/icon/Marker25-50.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -397,7 +400,7 @@ export class MapPage {
     this.iconStyle0_25 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0-25.png',
+        src: 'assets/icon/Marker0-25.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -406,7 +409,7 @@ export class MapPage {
     this.iconStyle0 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0.png',
+        src: 'assets/icon/Marker0.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -491,70 +494,8 @@ export class MapPage {
     this.could_locate = false;
     var self = this;
     this.positionFeature = new ol.Feature();
-
-    var geolocation = new ol.Geolocation({
-      projection: this.view.getProjection()
-    });
-
-
-
-      geolocation.setTracking(true);
-
-    // update the HTML page when the position changes.
-    geolocation.on('change', function() {
-      document.getElementById('accuracy').innerText = geolocation.getAccuracy() + ' [m]';
-      document.getElementById('altitude').innerText = geolocation.getAltitude() + ' [m]';
-      document.getElementById('altitudeAccuracy').innerText = geolocation.getAltitudeAccuracy() + ' [m]';
-      document.getElementById('heading').innerText = geolocation.getHeading() + ' [rad]';
-      document.getElementById('speed').innerText = geolocation.getSpeed() + ' [m/s]';
-    });
-
-    // handle geolocation error.
-    geolocation.on('error', function(error) {
-      alert("Impossible de vous localiser");
-    });
-
-    var positionFeature = new ol.Feature();
-    positionFeature.setStyle(new ol.style.Style({
-      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-        opacity: 1,
-        src: '../../assets/icon/self.png',
-        anchor: [0.5,1]
-      }))
-    }));
-
-    positionFeature.set("name","self");
-
-    geolocation.on('change:position', function() {
-      this.could_locate = true;
-      document.getElementById("search_stations").style.display="";
-      document.getElementById("p_check_self").style.display="";
-      var coordinates = geolocation.getPosition();
-      positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
-      self.positionFeature.setGeometry(positionFeature.getGeometry());
-      self.view.setCenter(coordinates);
-      self.view.setZoom(16);
-    });
-
-    var geoVectorSource = new ol.source.Vector({
-      features: [positionFeature]
-    });
-
-    this.geoVector = new ol.layer.Vector({
-      source: geoVectorSource
-    });
-
-
-      var check_self = document.getElementById('check_self');
-      check_self.addEventListener('change', function(evt) {
-        if(check_self['checked']) {
-          geoVectorSource.addFeature(positionFeature);
-        } else {
-          geoVectorSource.clear();
-        }
-      });
-    }
-
+  }
+ 
 
 
   manageDisplay() {
@@ -569,8 +510,62 @@ export class MapPage {
 
 
   ionViewDidLoad() {
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        console.log("navigator.geolocation works well");
+    }
+
+    var geoVectorSource = new ol.source.Vector({
+      features: [positionFeature]
+    });
+
+    this.geoVector = new ol.layer.Vector({
+      source: geoVectorSource
+    });
+    var geolocation = new ol.Geolocation();
+    var permissions = cordova.plugins.permissions;
+    if(device.platform=='Android' && !permissions.hasPermission(permissions.ACCESS_COARSE_LOCATION, null, null) && !permissions.hasPermission(permissions.ACCESS_FINE_LOCATION, null, null)) {
+      permissions.requestPermission(permissions.ACCESS_FINE_LOCATION, null, null);
+      navigator.geolocation.getCurrentPosition(changePosition, null);
+    }
+    var positionFeature = new ol.Feature();
+    positionFeature.setStyle(new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        opacity: 1,
+        src: 'assets/icon/self.png',
+        anchor: [0.5,1]
+      }))
+    }));
+    this.positionFeature = positionFeature.clone();
+    positionFeature.set("name","self");
+    var storage = window.localStorage;
+    this.positionFeature = new ol.Feature();
+    var self = this;
+
     this.markers_state = this.gms.getState();
     this.bikePaths_state = this.gbps.getState();
+
+    geolocation.on('change:position', function() {
+      this.could_locate = true;
+      document.getElementById("search_stations").style.display="";
+      document.getElementById("p_check_self").style.display="";
+      var coordinates = geolocation.getPosition();
+      positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
+      self.positionFeature.setGeometry(positionFeature.getGeometry());
+      self.view.setCenter(coordinates);
+      self.view.setZoom(16);
+    });
+
+    navigator.geolocation.getCurrentPosition(changePosition, null, { timeout: 30000 });
+    navigator.geolocation.watchPosition(changePosition, null, { timeout: 30000 })
+    function changePosition(position){
+      self.coordinates = ol.proj.transform([position.coords.longitude, position.coords.latitude], 'EPSG:4326', 'EPSG:3857');
+      positionFeature.setGeometry(self.coordinates ? new ol.geom.Point(self.coordinates) : null);
+      self.positionFeature.setGeometry(positionFeature.getGeometry());
+      self.view.setCenter(self.coordinates);
+      self.view.setZoom(16);
+    }
 
     if(typeof this.markers_state != undefined && typeof this.bikePaths_state != undefined) {
       var self = this;
@@ -619,8 +614,29 @@ export class MapPage {
 
     }
 
-
+    var check_self = document.getElementById('check_self');
+      check_self.addEventListener('change', function(evt) {
+        if(check_self['checked']) {
+          geoVectorSource.addFeature(positionFeature);
+        } else {
+          geoVectorSource.clear();
+        }
+      });
+    var check_stations = document.getElementById('check_stations');
+    check_stations.addEventListener('change', function(evt) {
+      if(check_stations['checked']) {
+        self.source.addFeatures(self.marker_features);
+      } else {
+        self.source.clear();
+      }
+    });
+    var check_bike_paths = document.getElementById('check_bike_paths');
+    check_bike_paths.addEventListener('change', function(evt) {
+      if(check_bike_paths['checked']) {
+        self.source_path.addFeatures(self.bike_path_features);
+      } else {
+        self.source_path.clear();
+      }
+    });
   }
-
-
 }
