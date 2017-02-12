@@ -478,7 +478,7 @@ export class MapPage {
       feature.set("address",address);
       feature.set("available_bikes", available_bikes);
       feature.set("available_bike_stands",available_bike_stands);
-      feature.set("ration",ratio);
+      feature.set("ratio",ratio);
       feature.set("number", number);
       feature.setGeometry(point)
       this.setFeatureStyle(feature);
