@@ -7,7 +7,8 @@ import { NavController } from 'ionic-angular';
 import { GoogleMap, GoogleMapsEvent, GoogleMapsLatLng } from 'ionic-native';
 
 declare var ol: any;
-
+declare var cordova: any;
+declare var device: any;
 
 @Component({
   selector: 'page-map',
@@ -29,6 +30,7 @@ export class MapPage {
   source: any;
   positionFeature: any;
   source_path: any;
+  coordinates: any;
 
 
   constructor(public navCtrl: NavController,private markerService: MarkerService, private globalMarkersService: GlobalMarkersService, private bikePathService: BikePathService, private globalBikePathsService: GlobalBikePathsService) {
@@ -94,7 +96,7 @@ export class MapPage {
     var iconStyle100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker100.png',
+        src: 'assets/icon/Marker100.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -102,7 +104,7 @@ export class MapPage {
     var iconStyle75_100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker75-100.png',
+        src: 'assets/icon/Marker75-100.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -110,7 +112,7 @@ export class MapPage {
     var iconStyle50_75 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker50-75.png',
+        src: 'assets/icon/Marker50-75.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -118,7 +120,7 @@ export class MapPage {
     var iconStyle25_50 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker25-50.png',
+        src: 'assets/icon/Marker25-50.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -126,7 +128,7 @@ export class MapPage {
     var iconStyle0_25 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0-25.png',
+        src: 'assets/icon/Marker0-25.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -135,7 +137,7 @@ export class MapPage {
     var iconStyle0 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0.png',
+        src: 'assets/icon/Marker0.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -177,26 +179,34 @@ export class MapPage {
   }
 
   ionViewDidLoad() {
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        console.log("navigator.geolocation works well");
+    }
+    var permissions = cordova.plugins.permissions;
+    if(device.platform=='Android' && !permissions.hasPermission(permissions.ACCESS_COARSE_LOCATION, null, null) && !permissions.hasPermission(permissions.ACCESS_FINE_LOCATION, null, null)) {
+      permissions.requestPermission(permissions.ACCESS_FINE_LOCATION, null, null);
+      navigator.geolocation.getCurrentPosition(changePosition, null);
+    }
     var storage = window.localStorage;
     this.positionFeature = new ol.Feature();
     var self = this;
 
 
-this.buildMarkerFeatures();
-this.buildBikePathFeatures();
-  this.source = new ol.source.Vector({
-    features: this.marker_features
-  });
+    this.buildMarkerFeatures();
+    this.buildBikePathFeatures();
+      this.source = new ol.source.Vector({
+        features: this.marker_features
+      });
 
-this.source_path = new ol.source.Vector({
-  features: this.bike_path_features
-});
-  var view = new ol.View({
-    center: ol.proj.transform([4.8323750495910645,45.7574933281114], 'EPSG:4326','EPSG:3857'),
-    zoom: 13 ,
-    minZoom: 12,
-    maxZoom: 20
-  });
+    this.source_path = new ol.source.Vector({
+      features: this.bike_path_features
+    });
+      var view = new ol.View({
+        center: ol.proj.transform([4.8323750495910645,45.7574933281114], 'EPSG:4326','EPSG:3857'),
+        zoom: 13,
+        maxZoom: 20
+      });
 
 
 
@@ -207,17 +217,7 @@ this.source_path = new ol.source.Vector({
     function el(id) {
       return document.getElementById(id);
     }
-
-      geolocation.setTracking(true);
-
-    // update the HTML page when the position changes.
-    geolocation.on('change', function() {
-      el('accuracy').innerText = geolocation.getAccuracy() + ' [m]';
-      el('altitude').innerText = geolocation.getAltitude() + ' [m]';
-      el('altitudeAccuracy').innerText = geolocation.getAltitudeAccuracy() + ' [m]';
-      el('heading').innerText = geolocation.getHeading() + ' [rad]';
-      el('speed').innerText = geolocation.getSpeed() + ' [m/s]';
-    });
+    
 
     // handle geolocation error.
     geolocation.on('error', function(error) {
@@ -230,20 +230,21 @@ this.source_path = new ol.source.Vector({
     positionFeature.setStyle(new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/self.png',
+        src: 'assets/icon/self.png',
         anchor: [0.5,1]
       }))
     }));
-
     positionFeature.set("name","self");
-
-    geolocation.on('change:position', function() {
-      var coordinates = geolocation.getPosition();
-      positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
+    navigator.geolocation.getCurrentPosition(changePosition, null, { timeout: 30000 });
+    navigator.geolocation.watchPosition(changePosition, null, { timeout: 30000 })
+    function changePosition(position){
+      self.coordinates = ol.proj.transform([position.coords.longitude, position.coords.latitude], 'EPSG:4326', 'EPSG:3857');
+      positionFeature.setGeometry(self.coordinates ? new ol.geom.Point(self.coordinates) : null);
       self.positionFeature.setGeometry(positionFeature.getGeometry());
-      view.setCenter(coordinates);
+      view.setCenter(self.coordinates);
       view.setZoom(16);
-    });
+    }
+    
 
     var geoVectorSource = new ol.source.Vector({
       features: [positionFeature]
@@ -262,7 +263,6 @@ this.source_path = new ol.source.Vector({
 
     this.olMap = new ol.Map({
       target:"map",
-
       layers: [new ol.layer.Tile({
           source:new ol.source.OSM()
         }),
@@ -420,8 +420,5 @@ this.source_path = new ol.source.Vector({
         self.source_path.clear();
       }
     });
-
   }
-
-
 }
