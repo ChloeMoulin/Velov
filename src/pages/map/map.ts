@@ -5,9 +5,9 @@ import { BikePathService } from '../../models/bikePath.service';
 import { GlobalBikePathsService} from '../../models/globalBikePaths.service';
 import { NavController } from 'ionic-angular';
 
-
 declare var ol: any;
-
+declare var cordova: any;
+declare var device: any;
 
 @Component({
   selector: 'page-map',
@@ -49,7 +49,6 @@ export class MapPage {
   iconStyle25_50f: any;
   iconStyle0_25f: any;
   iconStyle0f: any;
-
 
 
   constructor(public navCtrl: NavController,private markerService: MarkerService, private globalMarkersService: GlobalMarkersService, private bikePathService: BikePathService, private globalBikePathsService: GlobalBikePathsService) {
@@ -166,9 +165,9 @@ export class MapPage {
 
               container.innerHTML += "</div>";
               if(storage.getItem(feature.get('number')) === null) {
-                container.innerHTML += "<div id=favourite><p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='../../assets/icon/star_empty.png' alt='star' /></p>";
+                container.innerHTML += "<div id=favourite><p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='assets/icon/star_empty.PNG' alt='star' /></p>";
               } else {
-                container.innerHTML += "<div id=favourite><p><span id='subtitle'> Retirer des favoris : </span><img id='check_favourite' src='../../assets/icon/star_full.png' alt='star' /></p>";
+                container.innerHTML += "<div id=favourite><p><span id='subtitle'> Retirer des favoris : </span><img id='check_favourite' src='assets/icon/star_full.PNG' alt='star' /></p>";
               }
 
               var check_favourite = document.getElementById('check_favourite');
@@ -256,9 +255,9 @@ export class MapPage {
     if(storage.getItem(feature.get('number')) === null) {
       if(this.markers_state == 2) {
         feature.setStyle(this.iconStyle100);
-      }else if (available_bike_stands == 0) {
+      } else if (available_bike_stands == 0) {
         feature.setStyle(this.iconStyle100);
-      }else if(available_bikes == 0) {
+      } else if(available_bikes == 0) {
         feature.setStyle(this.iconStyle0);
       } else if (ratio <= 0.25){
         feature.setStyle(this.iconStyle0_25);
@@ -297,11 +296,11 @@ export class MapPage {
     var storage = window.localStorage;
     if(storage.getItem(feature.get('number')) === null) {
       storage.setItem(feature.get("number"), feature.get("name"));
-      document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Retirer des favoris : </span><img id='check_favourite' src='../../assets/icon/star_full.png' alt='star' /></p>";
+      document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Retirer des favoris : </span><img id='check_favourite' src='assets/icon/star_full.PNG' alt='star' /></p>";
       document.getElementById("popup").style.boxShadow = "1px 1px 12px #F8E511;"
     } else {
       storage.removeItem(feature.get("number"));
-      document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='../../assets/icon/star_empty.png' alt='star'/></p>";
+      document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='assets/icon/star_empty.PNG' alt='star'/></p>";
       document.getElementById("popup").style.boxShadow = "1px 1px 12px #555;"
     }
     this.setFeatureStyle(feature);
@@ -365,7 +364,7 @@ export class MapPage {
     this.iconStyle100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker100.png',
+        src: 'assets/icon/Marker100.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -373,7 +372,7 @@ export class MapPage {
     this.iconStyle75_100 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker75-100.png',
+        src: 'assets/icon/Marker75-100.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -381,7 +380,7 @@ export class MapPage {
     this.iconStyle50_75 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker50-75.png',
+        src: 'assets/icon/Marker50-75.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -389,7 +388,7 @@ export class MapPage {
     this.iconStyle25_50 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker25-50.png',
+        src: 'assets/icon/Marker25-50.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -397,7 +396,7 @@ export class MapPage {
     this.iconStyle0_25 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0-25.png',
+        src: 'assets/icon/Marker0-25.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -406,7 +405,7 @@ export class MapPage {
     this.iconStyle0 = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0.png',
+        src: 'assets/icon/Marker0.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -415,7 +414,7 @@ export class MapPage {
     this.iconStyle100f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker100f.png',
+        src: 'assets/icon/Marker100f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -423,7 +422,7 @@ export class MapPage {
     this.iconStyle75_100f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker75-100f.png',
+        src: 'assets/icon/Marker75-100f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -431,7 +430,7 @@ export class MapPage {
     this.iconStyle50_75f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker50-75f.png',
+        src: 'assets/icon/Marker50-75f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -439,7 +438,7 @@ export class MapPage {
     this.iconStyle25_50f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker25-50f.png',
+        src: 'assets/icon/Marker25-50f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -447,7 +446,7 @@ export class MapPage {
     this.iconStyle0_25f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0-25f.png',
+        src: 'assets/icon/Marker0-25f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -456,7 +455,7 @@ export class MapPage {
     this.iconStyle0f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0f.png',
+        src: 'assets/icon/Marker0f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -486,77 +485,6 @@ export class MapPage {
       this.marker_features.push(feature);
     }
   }
-
-  manageGeolocalisation() {
-    this.could_locate = false;
-    var self = this;
-    this.positionFeature = new ol.Feature();
-
-    var geolocation = new ol.Geolocation({
-      projection: this.view.getProjection()
-    });
-
-
-
-      geolocation.setTracking(true);
-
-    // update the HTML page when the position changes.
-    geolocation.on('change', function() {
-      document.getElementById('accuracy').innerText = geolocation.getAccuracy() + ' [m]';
-      document.getElementById('altitude').innerText = geolocation.getAltitude() + ' [m]';
-      document.getElementById('altitudeAccuracy').innerText = geolocation.getAltitudeAccuracy() + ' [m]';
-      document.getElementById('heading').innerText = geolocation.getHeading() + ' [rad]';
-      document.getElementById('speed').innerText = geolocation.getSpeed() + ' [m/s]';
-    });
-
-    // handle geolocation error.
-    geolocation.on('error', function(error) {
-      alert("Impossible de vous localiser");
-    });
-
-    var positionFeature = new ol.Feature();
-    positionFeature.setStyle(new ol.style.Style({
-      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-        opacity: 1,
-        src: '../../assets/icon/self.png',
-        anchor: [0.5,1]
-      }))
-    }));
-
-    positionFeature.set("name","self");
-
-    geolocation.on('change:position', function() {
-      this.could_locate = true;
-      document.getElementById("search_stations").style.display="";
-      document.getElementById("p_check_self").style.display="";
-      var coordinates = geolocation.getPosition();
-      positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
-      self.positionFeature.setGeometry(positionFeature.getGeometry());
-      self.view.setCenter(coordinates);
-      self.view.setZoom(16);
-    });
-
-    var geoVectorSource = new ol.source.Vector({
-      features: [positionFeature]
-    });
-
-    this.geoVector = new ol.layer.Vector({
-      source: geoVectorSource
-    });
-
-
-      var check_self = document.getElementById('check_self');
-      check_self.addEventListener('change', function(evt) {
-        if(check_self['checked']) {
-          geoVectorSource.addFeature(positionFeature);
-        } else {
-          geoVectorSource.clear();
-        }
-      });
-    }
-
-
-
   manageDisplay() {
      if(this.markers_state == 1 && this.bikePaths_state == 1 && !this.could_locate) {
        document.getElementById("select").style.display="none";
@@ -566,17 +494,61 @@ export class MapPage {
        document.getElementById("p_check_bike_Paths").style.display="none";
      }
   }
-
+  manageGeolocalisation() {
+    this.could_locate = false;
+    var self = this;
+    this.positionFeature = new ol.Feature();
+  }
 
   ionViewDidLoad() {
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        console.log("navigator.geolocation works well");
+    }
+    var permissions = cordova.plugins.permissions;
+    if(device.platform =='Android' && !permissions.hasPermission(permissions.ACCESS_COARSE_LOCATION, null, null) && !permissions.hasPermission(permissions.ACCESS_FINE_LOCATION, null, null)) {
+      permissions.requestPermission(permissions.ACCESS_COARSE_LOCATION, null, null);
+      permissions.requestPermission(permissions.ACCESS_FINE_LOCATION, null, null);
+      navigator.geolocation.getCurrentPosition(setPosition, onError, { timeout: 30000, enableHighAccuracy:true });
+    }
+    var storage = window.localStorage;
+    
+
     this.markers_state = this.gms.getState();
     this.bikePaths_state = this.gbps.getState();
+
+    this.manageGeolocalisation();
+    function setPosition(position){
+      self.could_locate = true;
+      document.getElementById("search_stations").style.display="";
+      document.getElementById("p_check_self").style.display="";
+      var coordinates = ol.proj.transform([position.coords.longitude, position.coords.latitude], 'EPSG:4326', 'EPSG:3857');
+      self.positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
+      self.view.setCenter(coordinates);
+      self.view.setZoom(16);
+      self.geoVector.addFeature(self.positionFeature);
+    }
+
+    function changePosition(position){
+      self.could_locate = true;
+      document.getElementById("search_stations").style.display="";
+      document.getElementById("p_check_self").style.display="";
+      var coordinates = ol.proj.transform([position.coords.longitude, position.coords.latitude], 'EPSG:4326', 'EPSG:3857');
+      self.positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
+      self.geoVector.addFeature(self.positionFeature);
+    }
+
+    function onError(error) {
+        alert('code: '    + error.code    + '\n' +
+              'message: ' + error.message + '\n');
+    }
 
     if(typeof this.markers_state != undefined && typeof this.bikePaths_state != undefined) {
       var self = this;
       this.source = new ol.source.Vector();
       this.source_path = new ol.source.Vector();
-      this.geoVector = new ol.layer.Vector();
+      this.geoVector = new ol.source.Vector();
 
       this.view = new ol.View({
         center: ol.proj.transform([4.8323750495910645,45.7574933281114], 'EPSG:4326','EPSG:3857'),
@@ -584,7 +556,19 @@ export class MapPage {
         minZoom: 12,
         maxZoom: 20
       });
-      this.manageGeolocalisation();
+
+      navigator.geolocation.getCurrentPosition(setPosition, onError, { timeout: 30000, enableHighAccuracy:true });
+      navigator.geolocation.watchPosition(changePosition, onError, { timeout: 30000, enableHighAccuracy:true });
+      this.positionFeature.setStyle(new ol.style.Style({
+        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+          opacity: 1,
+          src: 'assets/icon/self.png',
+          anchor: [0.5,1]
+        })),
+        zIndex:2000
+      }));
+    
+      this.positionFeature.set("name","self");
       this.olMap = new ol.Map({
         target:"map",
 
@@ -592,13 +576,14 @@ export class MapPage {
             source:new ol.source.OSM()
           }),
           new ol.layer.Vector({
-              source: this.source_path
+            source: this.source_path
           }),
           new ol.layer.Vector({
-                source: this.source
-              }),
-              this.geoVector
-
+            source: this.source
+          }),
+          new ol.layer.Vector({
+            source: this.geoVector
+          })
         ],
         controls: ol.control.defaults({
           attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
@@ -619,8 +604,29 @@ export class MapPage {
 
     }
 
-
+    var check_self = document.getElementById('check_self');
+    check_self.addEventListener('change', function(evt) {
+      if(check_self['checked']) {
+        self.geoVector.addFeature(self.positionFeature);
+      } else {
+        self.geoVector.clear();
+      }
+    });
+    var check_stations = document.getElementById('check_stations');
+    check_stations.addEventListener('change', function(evt) {
+      if(check_stations['checked']) {
+        self.source.addFeatures(self.marker_features);
+      } else {
+        self.source.clear();
+      }
+    });
+    var check_bike_paths = document.getElementById('check_bike_paths');
+    check_bike_paths.addEventListener('change', function(evt) {
+      if(check_bike_paths['checked']) {
+        self.source_path.addFeatures(self.bike_path_features);
+      } else {
+        self.source_path.clear();
+      }
+    });
   }
-
-
 }
