@@ -51,8 +51,6 @@ export class MapPage {
   iconStyle0_25f: any;
   iconStyle0f: any;
 
-  coordinates: any;
-
 
 
   constructor(public navCtrl: NavController,private markerService: MarkerService, private globalMarkersService: GlobalMarkersService, private bikePathService: BikePathService, private globalBikePathsService: GlobalBikePathsService) {
@@ -169,9 +167,9 @@ export class MapPage {
 
               container.innerHTML += "</div>";
               if(storage.getItem(feature.get('number')) === null) {
-                container.innerHTML += "<div id=favourite><p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='../../assets/icon/star_empty.png' alt='star' /></p>";
+                container.innerHTML += "<div id=favourite><p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='assets/icon/star_empty.PNG' alt='star' /></p>";
               } else {
-                container.innerHTML += "<div id=favourite><p><span id='subtitle'> Retirer des favoris : </span><img id='check_favourite' src='../../assets/icon/star_full.png' alt='star' /></p>";
+                container.innerHTML += "<div id=favourite><p><span id='subtitle'> Retirer des favoris : </span><img id='check_favourite' src='assets/icon/star_full.PNG' alt='star' /></p>";
               }
 
               var check_favourite = document.getElementById('check_favourite');
@@ -259,9 +257,9 @@ export class MapPage {
     if(storage.getItem(feature.get('number')) === null) {
       if(this.markers_state == 2) {
         feature.setStyle(this.iconStyle100);
-      }else if (available_bike_stands == 0) {
+      } else if (available_bike_stands == 0) {
         feature.setStyle(this.iconStyle100);
-      }else if(available_bikes == 0) {
+      } else if(available_bikes == 0) {
         feature.setStyle(this.iconStyle0);
       } else if (ratio <= 0.25){
         feature.setStyle(this.iconStyle0_25);
@@ -300,11 +298,11 @@ export class MapPage {
     var storage = window.localStorage;
     if(storage.getItem(feature.get('number')) === null) {
       storage.setItem(feature.get("number"), feature.get("name"));
-      document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Retirer des favoris : </span><img id='check_favourite' src='../../assets/icon/star_full.png' alt='star' /></p>";
+      document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Retirer des favoris : </span><img id='check_favourite' src='assets/icon/star_full.PNG' alt='star' /></p>";
       document.getElementById("popup").style.boxShadow = "1px 1px 12px #F8E511;"
     } else {
       storage.removeItem(feature.get("number"));
-      document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='../../assets/icon/star_empty.png' alt='star'/></p>";
+      document.getElementById('favourite').innerHTML = "<p><span id='subtitle'> Ajouter aux favoris : </span><img id='check_favourite' src='assets/icon/star_empty.PNG' alt='star'/></p>";
       document.getElementById("popup").style.boxShadow = "1px 1px 12px #555;"
     }
     this.setFeatureStyle(feature);
@@ -418,7 +416,7 @@ export class MapPage {
     this.iconStyle100f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker100f.png',
+        src: 'assets/icon/Marker100f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -426,7 +424,7 @@ export class MapPage {
     this.iconStyle75_100f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker75-100f.png',
+        src: 'assets/icon/Marker75-100f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -434,7 +432,7 @@ export class MapPage {
     this.iconStyle50_75f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker50-75f.png',
+        src: 'assets/icon/Marker50-75f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -442,7 +440,7 @@ export class MapPage {
     this.iconStyle25_50f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker25-50f.png',
+        src: 'assets/icon/Marker25-50f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -450,7 +448,7 @@ export class MapPage {
     this.iconStyle0_25f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0-25f.png',
+        src: 'assets/icon/Marker0-25f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -459,7 +457,7 @@ export class MapPage {
     this.iconStyle0f = new ol.style.Style({
       image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
         opacity: 1,
-        src: '../../assets/icon/Marker0f.png',
+        src: 'assets/icon/Marker0f.png',
         anchor: [0.5,1]
       })),
       zIndex:2000
@@ -481,7 +479,7 @@ export class MapPage {
       feature.set("address",address);
       feature.set("available_bikes", available_bikes);
       feature.set("available_bike_stands",available_bike_stands);
-      feature.set("ration",ratio);
+      feature.set("ratio",ratio);
       feature.set("number", number);
       feature.setGeometry(point)
       this.setFeatureStyle(feature);
@@ -515,63 +513,40 @@ export class MapPage {
     function onDeviceReady() {
         console.log("navigator.geolocation works well");
     }
-
-    var geoVectorSource = new ol.source.Vector({
-      features: [positionFeature]
-    });
-
-    this.geoVector = new ol.layer.Vector({
-      source: geoVectorSource
-    });
-    var geolocation = new ol.Geolocation();
     var permissions = cordova.plugins.permissions;
-    if(device.platform=='Android' && !permissions.hasPermission(permissions.ACCESS_COARSE_LOCATION, null, null) && !permissions.hasPermission(permissions.ACCESS_FINE_LOCATION, null, null)) {
+    if(device.platform =='Android' && !permissions.hasPermission(permissions.ACCESS_COARSE_LOCATION, null, null) && !permissions.hasPermission(permissions.ACCESS_FINE_LOCATION, null, null)) {
+      permissions.requestPermission(permissions.ACCESS_COARSE_LOCATION, null, null);
       permissions.requestPermission(permissions.ACCESS_FINE_LOCATION, null, null);
-      navigator.geolocation.getCurrentPosition(changePosition, null);
+      navigator.geolocation.getCurrentPosition(changePosition, onError, { timeout: 30000, enableHighAccuracy:true });
     }
-    var positionFeature = new ol.Feature();
-    positionFeature.setStyle(new ol.style.Style({
-      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-        opacity: 1,
-        src: 'assets/icon/self.png',
-        anchor: [0.5,1]
-      }))
-    }));
-    this.positionFeature = positionFeature.clone();
-    positionFeature.set("name","self");
     var storage = window.localStorage;
-    this.positionFeature = new ol.Feature();
-    var self = this;
+    
 
     this.markers_state = this.gms.getState();
     this.bikePaths_state = this.gbps.getState();
 
-    geolocation.on('change:position', function() {
-      this.could_locate = true;
+    this.manageGeolocalisation();
+    function changePosition(position){
+      self.could_locate = true;
       document.getElementById("search_stations").style.display="";
       document.getElementById("p_check_self").style.display="";
-      var coordinates = geolocation.getPosition();
-      positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
-      self.positionFeature.setGeometry(positionFeature.getGeometry());
+      var coordinates = ol.proj.transform([position.coords.longitude, position.coords.latitude], 'EPSG:4326', 'EPSG:3857');
+      self.positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
       self.view.setCenter(coordinates);
       self.view.setZoom(16);
-    });
+      self.geoVector.addFeature(self.positionFeature);
+    }
 
-    navigator.geolocation.getCurrentPosition(changePosition, null, { timeout: 30000 });
-    navigator.geolocation.watchPosition(changePosition, null, { timeout: 30000 })
-    function changePosition(position){
-      self.coordinates = ol.proj.transform([position.coords.longitude, position.coords.latitude], 'EPSG:4326', 'EPSG:3857');
-      positionFeature.setGeometry(self.coordinates ? new ol.geom.Point(self.coordinates) : null);
-      self.positionFeature.setGeometry(positionFeature.getGeometry());
-      self.view.setCenter(self.coordinates);
-      self.view.setZoom(16);
+    function onError(error) {
+        alert('code: '    + error.code    + '\n' +
+              'message: ' + error.message + '\n');
     }
 
     if(typeof this.markers_state != undefined && typeof this.bikePaths_state != undefined) {
       var self = this;
       this.source = new ol.source.Vector();
       this.source_path = new ol.source.Vector();
-      this.geoVector = new ol.layer.Vector();
+      this.geoVector = new ol.source.Vector();
 
       this.view = new ol.View({
         center: ol.proj.transform([4.8323750495910645,45.7574933281114], 'EPSG:4326','EPSG:3857'),
@@ -579,7 +554,19 @@ export class MapPage {
         minZoom: 12,
         maxZoom: 20
       });
-      this.manageGeolocalisation();
+
+      navigator.geolocation.getCurrentPosition(changePosition, onError, { timeout: 30000, enableHighAccuracy:true });
+      navigator.geolocation.watchPosition(changePosition, onError, { timeout: 30000, enableHighAccuracy:true });
+      this.positionFeature.setStyle(new ol.style.Style({
+        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+          opacity: 1,
+          src: 'assets/icon/self.png',
+          anchor: [0.5,1]
+        })),
+        zIndex:2000
+      }));
+    
+      this.positionFeature.set("name","self");
       this.olMap = new ol.Map({
         target:"map",
 
@@ -587,13 +574,14 @@ export class MapPage {
             source:new ol.source.OSM()
           }),
           new ol.layer.Vector({
-              source: this.source_path
+            source: this.source_path
           }),
           new ol.layer.Vector({
-                source: this.source
-              }),
-              this.geoVector
-
+            source: this.source
+          }),
+          new ol.layer.Vector({
+            source: this.geoVector
+          })
         ],
         controls: ol.control.defaults({
           attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
@@ -615,13 +603,13 @@ export class MapPage {
     }
 
     var check_self = document.getElementById('check_self');
-      check_self.addEventListener('change', function(evt) {
-        if(check_self['checked']) {
-          geoVectorSource.addFeature(positionFeature);
-        } else {
-          geoVectorSource.clear();
-        }
-      });
+    check_self.addEventListener('change', function(evt) {
+      if(check_self['checked']) {
+        self.geoVector.addFeature(self.positionFeature);
+      } else {
+        self.geoVector.clear();
+      }
+    });
     var check_stations = document.getElementById('check_stations');
     check_stations.addEventListener('change', function(evt) {
       if(check_stations['checked']) {
