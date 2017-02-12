@@ -5,7 +5,6 @@ import { BikePathService } from '../../models/bikePath.service';
 import { GlobalBikePathsService} from '../../models/globalBikePaths.service';
 import { NavController } from 'ionic-angular';
 
-
 declare var ol: any;
 declare var cordova: any;
 declare var device: any;
@@ -50,7 +49,6 @@ export class MapPage {
   iconStyle25_50f: any;
   iconStyle0_25f: any;
   iconStyle0f: any;
-
 
 
   constructor(public navCtrl: NavController,private markerService: MarkerService, private globalMarkersService: GlobalMarkersService, private bikePathService: BikePathService, private globalBikePathsService: GlobalBikePathsService) {
@@ -487,15 +485,6 @@ export class MapPage {
       this.marker_features.push(feature);
     }
   }
-
-  manageGeolocalisation() {
-    this.could_locate = false;
-    var self = this;
-    this.positionFeature = new ol.Feature();
-  }
- 
-
-
   manageDisplay() {
      if(this.markers_state == 1 && this.bikePaths_state == 1 && !this.could_locate) {
        document.getElementById("select").style.display="none";
@@ -505,7 +494,11 @@ export class MapPage {
        document.getElementById("p_check_bike_Paths").style.display="none";
      }
   }
-
+  manageGeolocalisation() {
+    this.could_locate = false;
+    var self = this;
+    this.positionFeature = new ol.Feature();
+  }
 
   ionViewDidLoad() {
 
@@ -535,6 +528,7 @@ export class MapPage {
       self.view.setCenter(coordinates);
       self.view.setZoom(16);
       self.geoVector.addFeature(self.positionFeature);
+
     }
 
     function onError(error) {
